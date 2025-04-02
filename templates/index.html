@@ -1,29 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data</title>
-    <script>
-        function fetchLatestData() {
-            fetch('/latest-data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('valor_sensor_hall').textContent = data.valor_sensor_hall || 'N/A';
-                    document.getElementById('temperatura').textContent = data.temperatura || 'N/A';
-                    document.getElementById('humidade').textContent = data.humidade || 'N/A';
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        }
-
-        // Fetch data every 2 seconds
-        setInterval(fetchLatestData, 2000);
-    </script>
-</head>
+{% include 'header.html' %}
 <body>
-    <h1>Sensor Data</h1>
-    <p><strong>Valor Sensor Hall:</strong> <span id="valor_sensor_hall">N/A</span></p>
-    <p><strong>Temperatura:</strong> <span id="temperatura">N/A</span> °C</p>
-    <p><strong>Humidade:</strong> <span id="humidade">N/A</span> %</p>
+    <div class="card">
+        <div class="chuva_probabilidade">
+            <h2>Probabilidade de Chuva</h2>
+            <div><p id="probabilidade">N/A</p></div>
+            <div>
+                <p>Valor Sensor Hall: <span id="valor_sensor_hall">N/A</span></p>
+                <p>Temperatura: <span id="temperatura">N/A</span> °C</p>
+                <p>Humidade: <span id="humidade">N/A</span> %</p>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

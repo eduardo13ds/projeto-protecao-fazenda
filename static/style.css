@@ -1,0 +1,42 @@
+/* Header styling */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f4f4f4;
+}
+
+/* Header title styling */
+.header-title {
+    margin: 0;
+    text-align: center;
+    flex-grow: 1;
+}
+
+/* Login button styling */
+.login-button {
+    margin-left: auto;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background-color: #0056b3;
+}
+
+/* Existing styles */
+h1 {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+}
+
+svg {
+    display: inline-block;
+    vertical-align: middle;
+}

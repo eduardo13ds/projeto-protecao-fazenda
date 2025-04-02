@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Data</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+        function fetchLatestData() {
+            fetch('/latest-data')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('valor_sensor_hall').textContent = data.valor_sensor_hall || 'N/A';
+                    document.getElementById('temperatura').textContent = data.temperatura || 'N/A';
+                    document.getElementById('humidade').textContent = data.humidade || 'N/A';
+                    document.getElementById('probabilidade').textContent = data.probabilidade || 'N/A';
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        }
+
+        // Fetch data every 2 seconds
+        setInterval(fetchLatestData, 2000);
+    </script>
+</head>
+<body>
+    <header class="header">
+        <h1 class="header-title">Sensor Data</h1>
+        <button class="login-button">Login</button>
+    </header>
+</body>
+</html>
