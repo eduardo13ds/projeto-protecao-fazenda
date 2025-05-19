@@ -1,42 +1,176 @@
-/* Header styling */
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    background-color: #f4f4f4;
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
+
+
+#razoes-lista {
+    max-height: 100px; /* ou altura fixa que você quiser */
+    min-height: 100px; /* ou altura fixa que você quiser */
+    overflow-y: auto;
 }
 
-/* Header title styling */
-.header-title {
-    margin: 0;
-    text-align: center;
-    flex-grow: 1;
+/* --- NAVBAR --- */
+nav {
+    margin-bottom: 1rem;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+    background-color: #f0f2f5; /* cinza claro neutro */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Login button styling */
-.login-button {
-    margin-left: auto;
-    padding: 10px 20px;
-    background-color: #007BFF;
-    color: white;
+.navbar-brand,
+.navbar-brand * {
+    color: #2d3436; /* texto escuro */
+}
+
+.nav-link {
+    color: #2d3436;
+    background-color: transparent;
+    transition: background-color 0.25s, color 0.25s;
+}
+
+.nav-link:hover,
+.nav-link:focus {
+    background-color: #d6e9f8; /* azul bem leve */
+    color: #1d3557; /* azul escuro para hover */
+}
+
+a.nav-link.ms-lg-3 {
+    background-color: #457b9d; /* azul médio */
+    color: #f1faee !important;
+    font-weight: 600;
+    transition: background-color 0.3s;
+}
+
+a.nav-link.ms-lg-3:hover {
+    background-color: #1d3557; /* azul escuro */
+    color: #f1faee !important;
+}
+
+/* --- DROPDOWNS --- */
+.dropdown-menu {
+    background-color: #f1f3f5;
+    border: 1px solid #cfd8dc;
+}
+
+.dropdown-item {
+    color: #2d3436;
+}
+
+.dropdown-item:hover {
+    background-color: #a8dadc; /* azul pastel */
+    color: #1d3557;
+}
+
+/* --- BODY --- */
+body {
+    padding: 0 5vw;
+    background-color: #f0f2f5;
+    color: #2d3436;
+    font-family: "Syne", sans-serif;
+}
+
+/* --- CARDS --- */
+.card {
+    background-color: #ffffff;
     border: none;
-    border-radius: 5px;
-    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+    border-radius: 0.75rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-.login-button:hover {
-    background-color: #0056b3;
+.card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
 }
 
-/* Existing styles */
-h1 {
-    display: inline-block;
-    vertical-align: middle;
-    margin: 0;
+.card-title {
+    font-weight: 700;
+    color: #1d3557; /* azul escuro */
 }
 
-svg {
-    display: inline-block;
-    vertical-align: middle;
+.card-body p,
+.card-body ul,
+.card-body li {
+    color: #495057;
+}
+
+/* --- CORES DOS CARDS DINÂMICOS --- */
+.dynamic-card {
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: #2d3436;
+}
+
+.dynamic-card.green {
+    background-color: #b7e4c7; /* verde suave */
+}
+
+.dynamic-card.blue {
+    background-color: #a8dadc; /* azul suave */
+}
+
+.dynamic-card.red {
+    background-color: #ffb4a2; /* coral leve */
+}
+
+.dynamic-card.yellow {
+    background-color: #ffe066; /* amarelo pastel */
+}
+
+/* --- GRÁFICO --- */
+canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+/* --- BOTÕES DO GRÁFICO --- */
+.btn-group .btn {
+    border-radius: 0.25rem;
+    border-color: #457b9d;
+    color: #457b9d;
+    font-weight: 600;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-group .btn:hover,
+.btn-group .btn:focus {
+    background-color: #457b9d;
+    color: #f1faee;
+}
+
+/* --- LEGENDAS --- */
+.trend-legend span {
+    margin-right: 1.2rem;
+    font-weight: 600;
+    color: #1d3557;
+}
+
+/* --- HISTÓRICO E CONFIGURAÇÕES --- */
+.list-group-item {
+    background-color: transparent;
+    color: #2d3436;
+    border: none;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.badge {
+    font-size: 0.75rem;
+    padding: 0.4em 0.6em;
+    font-weight: 700;
+    border-radius: 0.5rem;
+}
+
+/* Badges coloridos */
+.badge.bg-warning {
+    background-color: #ffe066;
+    color: #1d3557;
+}
+
+.badge.bg-primary {
+    background-color: #457b9d;
+    color: #f1faee;
+}
+
+.badge.bg-danger {
+    background-color: #ff6b6b;
+    color: white;
 }

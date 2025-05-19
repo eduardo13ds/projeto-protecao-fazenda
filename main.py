@@ -1,36 +1,39 @@
 # -*- coding: utf-8 -*-
-import umqtt.simple as mqtt  # Biblioteca para MQTT em MicroPython # type: ignore
-import ujson  # Biblioteca para manipulação de JSON em MicroPython # type: ignore
-import esp32 # type: ignore
-from machine import Pin # type: ignore
 import time
 
-# Configuração do sensor Hall
-sensor_hall = Pin(34, Pin.IN)  # GPIO 34 como entrada
+import dht
+import ujson  # Biblioteca para manipulação de JSON em MicroPython # type: ignore
+import umqtt.simple as mqtt  # Biblioteca para MQTT em MicroPython # type: ignore
+from machine import ADC, Pin  # type: ignore
+
 # Configuração do DHT22
-sensor_dht = Pin(32, Pin.IN)  # GPIO 32 como entrada
 
-# Calibração inicial
-def calibrar_sensor(amostras=20):
-    print("Calibrando sensor Hall...")
-    valores = []
-    for _ in range(amostras):
-        valores.append(esp32.hall_sensor())
-        time.sleep(0.1)
-    baseline = sum(valores) / len(valores)
-    print("Valor base:", baseline)
-    return baseline
+sensor_dht = dht.DHT11(Pin(18))  # GPIO 18 para o DHT11
 
-# Inicialização
-valor_base = calibrar_sensor()
-ultimo_valor = valor_base
+# Configuração do potenciômetro (GPIO2)
+pot = ADC(Pin(2))
+pot.atten(ADC.ATTN_11DB)  # Faixa de 0-3.3V
 
-print("Monitorando campo magnético...")
+# Valor do resistor de carga
+R = 100  # 100 Ohms
+
+print("Iniciando monitoramento...")
 
 while True:
-    # Leitura do sensor Hall
-    valor_sensorh = esp32.hall_sensor()
-    print("Valor sensor Hall:", valor_sensorh)
+    print("Tudo ocorrendo perfeitamente :D")
+
+    # Leitura do ADC (12 bits = 0-4095)
+    adc_value = pot.read()
+
+    # Conversão para tensão
+    voltage = (adc_value * 3.3) / 4095
+
+    # Cálculo da corrente (Lei de Ohm)
+    current = voltage / R
+    current_mA = current * 1000  # Converte para miliamperes
+
+    # Exibição dos resultados
+    print(f"ADC: {adc_value:4d} | Tensão: {voltage:.3f}V | Corrente: {current_mA:.2f}mA")
 
     # Leitura do DHT22 (simulação)
     temperatura = sensor_dht.temperature()
@@ -40,14 +43,17 @@ while True:
     print("Humidade:", humidade)
 
     # Encapsulando as variáveis em JSON
-
     dados = {
-        "valor_sensor_hall": valor_sensorh,
+        "adc_value": adc_value,
+        "voltage": voltage,
+        "current_mA": current_mA,
+        "valor_sensor_hall": current_mA,  # Mantendo compatibilidade com o frontend
         "temperatura": temperatura,
         "humidade": humidade
     }
 
     json_dados = ujson.dumps(dados)
+
 
     # Configuração do MQTT
 
@@ -58,9 +64,11 @@ while True:
         else:
             print(f"Falha na conexão. Código de retorno: {rc}")
 
+
     # Define the on_publish callback
     def on_publish(client, userdata, mid):
         print(f"Mensagem publicada com ID: {mid}")
+
 
     # client_id is the given name of the client
     client = mqtt.Client(client_id="", userdata=None, protocol=mqtt.MQTTv5)
@@ -72,7 +80,7 @@ while True:
     # set username and password
     client.username_pw_set("hivemq.webclient.1743567366904", "02DGadKA1Bb3fcCg.,;&")
     # connect to HiveMQ Cloud on port 8883 (default for MQTT)
-    client.connect("8ecd1811af00401b9570971ba2df918d.s1.eu.hivemq.cloud", 8883)
+    client.connect("fd2522b769fc4f16bb479a6cac3dcb7b.s1.eu.hivemq.cloud", 8883)
 
     # Start the MQTT client loop
     client.loop_start()

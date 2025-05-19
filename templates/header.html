@@ -1,31 +1,64 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sensor Data</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script>
-        function fetchLatestData() {
-            fetch('/latest-data')
-                .then(response => response.json())
-                .then(data => {
-                    document.getElementById('valor_sensor_hall').textContent = data.valor_sensor_hall || 'N/A';
-                    document.getElementById('temperatura').textContent = data.temperatura || 'N/A';
-                    document.getElementById('humidade').textContent = data.humidade || 'N/A';
-                    document.getElementById('probabilidade').textContent = data.probabilidade || 'N/A';
-                })
-                .catch(error => console.error('Error fetching data:', error));
-        }
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <!-- Navbar Brand: logo + site name -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img
+                    src="{{ url_for('static', filename='images/logo.svg') }}"
+                    alt="StormGuard logo"
+                    width="32"
+                    height="32"
+                    class="d-inline-block align-text-top me-2"
+            >
+            <span class="h4 mb-0">StormGuard</span>
+        </a>
 
-        // Fetch data every 2 seconds
-        setInterval(fetchLatestData, 2000);
-    </script>
-</head>
-<body>
-    <header class="header">
-        <h1 class="header-title">Sensor Data</h1>
-        <button class="login-button">Login</button>
-    </header>
-</body>
-</html>
+        <!-- Toggler (visible on mobile) -->
+        <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Collapsible menu items -->
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill me-2 px-3 py-1" aria-current="page" href="/">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill me-2 px-3 py-1" href="/painel_alertas">Painel de Alertas</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill me-2 px-3 py-1" href="/relatorios">Relatórios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link rounded-pill me-2 px-3 py-1" href="/configuracoes">Configurações</a>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle rounded-pill me-2 px-3 py-1"
+                       href="#" id="areaDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Área: Central
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="areaDropdown">
+                        <li><a class="dropdown-item" href="/area/central">Central</a></li>
+                        <li><a class="dropdown-item" href="/area/norte">Norte</a></li>
+                        <li><a class="dropdown-item" href="/area/sul">Sul</a></li>
+                        <li><a class="dropdown-item" href="/area/leste">Leste</a></li>
+                        <li><a class="dropdown-item" href="/area/oeste">Oeste</a></li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Botão de Login -->
+            <a href="/login"
+               class="nav-link rounded-pill ms-lg-3 mt-2 mt-lg-0 px-3 py-1">Login</a>
+        </div>
+    </div>
+</nav>

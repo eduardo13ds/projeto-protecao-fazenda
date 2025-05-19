@@ -1,0 +1,43 @@
+<svg
+        width="64"
+        height="64"
+        viewBox="0 0 16 18"
+        preserveAspectRatio="xMidYMid meet"
+        xmlns="http://www.w3.org/2000/svg"
+>
+    <!--
+      We wrapped everything in a <g> that shifts the artwork down by 1 unit.
+      The new viewBox is 16×18, so there’s 1 unit of padding at the top and 1 unit at the bottom.
+    -->
+    <g transform="translate(0,1)">
+        <!-- Blue storm gradient for the cloud -->
+        <defs>
+            <linearGradient id="blueStorm" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2C3E8E"/>
+                <stop offset="100%" stop-color="#5A7FCF"/>
+            </linearGradient>
+        </defs>
+
+        <!-- Raindrops (long, slanted, deep navy) -->
+        <g fill="#0B3D91">
+            <path d="M3.8 13.9a.5.5 0 0 1-.45-.68l1.2-3a.5.5 0 1 1 .92.36l-1.2 3a.5.5 0 0 1-.47.32z"/>
+            <path d="M7.8 13.9a.5.5 0 0 1-.45-.68l1.2-3a.5.5 0 1 1 .92.36l-1.2 3a.5.5 0 0 1-.47.32z"/>
+            <path d="M11.8 13.9a.5.5 0 0 1-.45-.68l1.2-3a.5.5 0 1 1 .92.36l-1.2 3a.5.5 0 0 1-.47.32z"/>
+            <path d="M9.8 15.2a.5.5 0 0 1-.45-.68l1.2-3a.5.5 0 1 1 .92.36l-1.2 3a.5.5 0 0 1-.47.32z"/>
+        </g>
+
+        <!-- Lightning bolt (bright yellow) -->
+        <path
+                d="M8 11 L7.2 14 H9 L7.8 16.5 L8.5 13.5 H7.2 Z"
+                fill="#F3D547"
+        />
+
+        <!-- Cloud shape (blue gradient + darker-blue outline) -->
+        <path
+                d="M3.5 11h9a3.5 3.5 0 0 0 .16-7A5.5 5.5 0 0 0 2.06 7.03a2.5 2.5 0 0 0 1.44 3.97z"
+                fill="url(#blueStorm)"
+                stroke="#3752A3"
+                stroke-width="0.6"
+        />
+    </g>
+</svg>
