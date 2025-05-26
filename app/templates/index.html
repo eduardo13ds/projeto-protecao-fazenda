@@ -3,10 +3,11 @@
     Stormguard - Página Inicial
 {% endblock %}
 {% block content %}
+
+    {% include 'alert.html' %}
     {#    <div class="alert alert-warning py-2">#}
     {#        <strong>Alerta de Chuva Forte</strong> - Probabilidade de 75% nas próximas 2 horas#}
     {#    </div>#}
-
     <div class="row row-cols-1 row-cols-md-4 g-4 mb-4">
         <div class="col">
             <div id="card-probabilidade" class="card text-center dynamic-card h-100">

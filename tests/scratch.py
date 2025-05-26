@@ -2,8 +2,9 @@
 import json
 import random
 import time
-
 import paho.mqtt.client as mqtt
+
+codigo_area = 1
 
 # Constantes ajustáveis (você pode calibrar estes valores com base em observações)
 # Umidade
@@ -24,7 +25,6 @@ VARIACAO_CORRENTE_FORTE = 30  # Variação forte, possível tempestade se aproxi
 
 # Período de medição (em minutos)
 PERIODO_ANALISE = 30  # Intervalo de tempo entre medições para análise de tendências
-
 
 def prever_chuva(umidade_atual, temperatura_atual, corrente_atual,
                  umidade_anterior, temperatura_anterior, corrente_anterior,
@@ -221,6 +221,7 @@ while True:
         "humidade": umidade,
         "probabilidade": probabilidade if 'probabilidade' in locals() else "Indefinida",
         "razoes": razoes if 'razoes' in locals() else [],
+        "area": codigo_area
     }
 
     json_dados = json.dumps(dados, ensure_ascii=False)
