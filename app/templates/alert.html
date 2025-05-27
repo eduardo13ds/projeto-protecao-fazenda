@@ -41,7 +41,6 @@
 
         .custom-heavy-rain-alert .alert-title {
             font-size: 1.25rem;
-            font-weight: bold;
             margin-bottom: 0.1rem;
         }
 
@@ -111,7 +110,7 @@
     </style>
 
     <div class="container">
-        <div class="custom-heavy-rain-alert slim d-flex align-items-center" id="custom-heavy-rain-alert">
+        <div class="custom-heavy-rain-alert slim d-flex align-items-center d-none" id="custom-heavy-rain-alert">
             <i class="fas fa-cloud-showers-heavy alert-icon-main"></i>
             <div class="alert-content">
                 <div>
@@ -119,11 +118,11 @@
                     <span class="badge bg-danger ms-2">Crítico</span>
                 </div>
                 <div class="alert-details d-flex flex-wrap align-items-center">
-                    <div><i class="fas fa-map-marker-alt"></i>Área: Central</div>
+                    <div><i class="fas fa-map-marker-alt"></i>Área: <span id="alert-area">--</span></div>
                     <div><i class="far fa-clock"></i>Previsão: Próximas 2 horas</div>
-                    <div><i class="fas fa-water"></i>Probabilidade: <strong id="alert-probabilidade">75%</strong></div>
-                    <div><i class="fas fa-tint"></i>Umidade: <strong id="alert-umidade">85%</strong></div>
-                    <div><i class="fas fa-bolt"></i>Campo Elétrico: <strong id="alert-campo-eletrico">10 V/m²</strong></div>
+                    <div><i class="fas fa-water"></i>Probabilidade: <strong id="alert-probabilidade">--%</strong></div>
+                    <div><i class="fas fa-tint"></i>Umidade: <strong id="alert-umidade">--%</strong></div>
+                    <div><i class="fas fa-bolt"></i>Campo Elétrico: <strong id="alert-campo-eletrico">-- V/m²</strong></div>
                 </div>
             </div>
             <i class="fas fa-cloud-bolt alert-icon-background"></i>
@@ -133,12 +132,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
     // Atualiza os valores do alerta com dados do script.js
-    function updateAlert(prob, umid, campo) {
+    function updateAlert(prob, umid, campo, area) {
         document.getElementById('alert-probabilidade').textContent = prob + '%';
         document.getElementById('alert-umidade').textContent = umid + '%';
-        document.getElementById('alert-campo-eletrico').textContent = campo + ' V/m²';
+        document.getElementById('alert-campo-eletrico').textContent = campo + ' V/m²'; // Or use mA if that's the actual unit from data
+        document.getElementById('alert-area').textContent = area || 'N/A';
     }
-
-    // Exemplo de integração: você pode chamar updateAlert dentro de fetchLatestData em script.js
-    // updateAlert(data.probabilidade, data.humidade, data.campo_eletrico);
     </script>

@@ -207,16 +207,33 @@ canvas {
     background: #ff4427;
 }
 
+/* Style for Header Alert Indicator */
+#header-alert-status.alert-active {
+    background-color: #dc3545 !important; /* Bootstrap danger red */
+    color: white !important;
+    font-weight: bold;
+}
+
+#header-alert-status.alert-inactive {
+    background-color: #1D3557; /* Original color for alert-indicator */
+    color: white;
+    font-weight: normal;
+}
+
+/* Ensure the .indicator class base styles are applied */
 .indicator {
     padding: 3px 20px;
     color: white;
+    /* Make sure existing styles from .alert-indicator are preserved or merged */
 }
 
 .alert-indicator {
     margin: 0 15px;
-    background: #1D3557;
-    color: white;
+    /* background is handled by alert-active/alert-inactive */
+    /* color is handled by alert-active/alert-inactive */
 }
+
+
 
 .live-button {
     margin-left: 10px;
@@ -256,4 +273,5 @@ canvas {
         opacity: 0;
     }
 }
+
 
