@@ -211,7 +211,6 @@ canvas {
 #header-alert-status.alert-active {
     background-color: #dc3545 !important; /* Bootstrap danger red */
     color: white !important;
-    font-weight: bold;
 }
 
 #header-alert-status.alert-inactive {

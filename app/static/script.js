@@ -70,7 +70,7 @@ function fetchLatestData(areaId = null) {
                         }
                     }
                     if (headerAlertStatus) {
-                        headerAlertStatus.textContent = "Alerta Ativo!";
+                        headerAlertStatus.textContent = "Alerta Ativo";
                         headerAlertStatus.classList.remove("alert-inactive");
                         headerAlertStatus.classList.add("alert-active");
                     }
