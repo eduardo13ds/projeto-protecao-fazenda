@@ -48,6 +48,11 @@ def index(area_id=None):
     # 'current_area' is used by the template, esp. header.
     return render_template('index.html', data=data, current_area=area_id, current_area_name=current_area_name)
 
+@main.route('/painel_alertas')
+def painel_alertas():
+    """Render the alerts page."""
+    return render_template('alertas.html')
+
 
 @main.route('/latest-data', methods=['GET'])
 @main.route('/latest-data/<int:area_id>', methods=['GET'])
@@ -62,7 +67,7 @@ def latest_data_endpoint(area_id=None):
         Response: JSON response with the latest data.
     """
     # Get the latest data from MQTT client, already filtering by area
-    # data = mqtt_client.get_latest_data(area_id)
+    data = mqtt_client.get_latest_data(area_id)
 
     data = {
         "adc_value": 3528,
@@ -82,4 +87,10 @@ def latest_data_endpoint(area_id=None):
     # Adicionar um log para depuração
     print(f"Recebido requisição para área {area_id}, retornando dados: {data}")
 
+    return jsonify(data)
+
+@main.route('/latest-inmet', methods=['GET'])
+def latest_inmet_endpoint():
+    """Retorna o último dado recebido do INMET via MQTT."""
+    data = mqtt_client.get_latest_inmet_data()
     return jsonify(data)

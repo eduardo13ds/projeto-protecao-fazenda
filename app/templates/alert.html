@@ -37,6 +37,7 @@
 
         .custom-heavy-rain-alert .alert-content {
             flex-grow: 1;
+            margin-right: 1rem; /* Espaço para o botão */
         }
 
         .custom-heavy-rain-alert .alert-title {
@@ -75,6 +76,24 @@
             font-size: 2.5rem; /* Tamanho do ícone de nuvem com raio à direita */
             opacity: 0.3; /* Opacidade para o ícone de fundo */
             margin-left: 0.5rem;
+        }
+
+        .protocol-button {
+            background-color: #ffffff;
+            color: #4a90e2;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            align-self: center;
+            margin-right: 1rem;
+        }
+
+        .protocol-button:hover {
+            background-color: #e6f0fa;
         }
 
         /* Ajustes para telas menores */
@@ -125,6 +144,9 @@
                     <div><i class="fas fa-bolt"></i>Campo Elétrico: <strong id="alert-campo-eletrico">-- V/m²</strong></div>
                 </div>
             </div>
+            <button class="protocol-button">
+                <i class="fas fa-play me-2"></i>Iniciar Protocolo
+            </button>
             <i class="fas fa-cloud-bolt alert-icon-background"></i>
         </div>
     </div>

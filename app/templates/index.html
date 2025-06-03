@@ -5,9 +5,47 @@
 {% block content %}
 
     {% include 'alert.html' %}
-    {#    <div class="alert alert-warning py-2">#}
-    {#        <strong>Alerta de Chuva Forte</strong> - Probabilidade de 75% nas próximas 2 horas#}
-    {#    </div>#}
+    <!-- Bloco de informações INMET em cards -->
+    <div class="row row-cols-1 row-cols-md-4 g-4 mb-2" id="inmet-cards-row">
+        <div class="col">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Chuva (mm)</h6>
+                    <p id="inmet-chuva" class="fs-5">--</p>
+                    <p class="text-muted small inmet-data-hora">--</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Vento (m/s)</h6>
+                    <p id="inmet-vento" class="fs-5">--</p>
+                    <p class="text-muted small inmet-data-hora">--</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Pressão (hPa)</h6>
+                    <p id="inmet-pressao" class="fs-5">--</p>
+                    <p class="text-muted small inmet-data-hora">--</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center h-100">
+                <div class="card-body">
+                    <h6 class="card-title">Radiação (KJ/m²)</h6>
+                    <p id="inmet-radiacao" class="fs-5">--</p>
+                    <p class="text-muted small inmet-data-hora">--</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Bloco de informações INMET -->
+    <div id="inmet-info" class="mb-3"></div>
     <div class="row row-cols-1 row-cols-md-4 g-4 mb-4">
         <div class="col">
             <div id="card-probabilidade" class="card text-center dynamic-card h-100">

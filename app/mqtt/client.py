@@ -9,6 +9,7 @@ import paho.mqtt.client as mqtt
 # Global variable to store the latest data received from MQTT, organized by area
 latest_data_by_area = {}
 latest_data = {}  # Manter para compatibilidade
+latest_inmet_data = {}  # Novo: armazena o último dado do INMET
 
 class MQTTClient:
     """MQTT client for connecting to a broker and handling messages."""
@@ -68,15 +69,26 @@ class MQTTClient:
         client.subscribe("sensor/dados", qos=1)
         if self.app:
             self.app.logger.info("Inscrito no tópico 'sensor/dados'")
+        # Novo: inscreve também no tópico do INMET
+        client.subscribe("inmet/dados", qos=1)
+        if self.app:
+            self.app.logger.info("Inscrito no tópico 'inmet/dados'")
 
     def _on_message(self, client, userdata, msg):
         """Callback for when a message is received from the broker."""
-        global latest_data, latest_data_by_area
+        global latest_data, latest_data_by_area, latest_inmet_data
         try:
             print(f"Mensagem recebida do tópico: {msg.topic}")
             data = json.loads(msg.payload.decode())
             print(f"Dados recebidos: {data}")
-    
+
+            if msg.topic == "inmet/dados":
+                latest_inmet_data = data
+                print(f"Dado INMET armazenado: {data}")
+                if self.app:
+                    self.app.logger.debug(f"INMET data received via MQTT: {data}")
+                return
+
             # Armazenar os dados mais recentes (para compatibilidade)
             latest_data = data
     
@@ -110,6 +122,11 @@ class MQTTClient:
             return latest_data_by_area.get(int(area_id), {})
 
         return latest_data
+
+    def get_latest_inmet_data(self):
+        """Retorna o último dado recebido do INMET via MQTT."""
+        global latest_inmet_data
+        return latest_inmet_data
 
 
 # Create a singleton instance

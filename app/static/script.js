@@ -132,6 +132,36 @@ function fetchLatestData(areaId = null) {
         });
 }
 
+// Função para atualizar os cards do INMET
+function updateInmetCards(data) {
+    document.getElementById('inmet-chuva').textContent = data["Chuva (mm)"] ?? '--';
+    document.getElementById('inmet-vento').textContent = data["Vel. Vento (m/s)"] ?? '--';
+    document.getElementById('inmet-pressao').textContent = data["Pressao Ins. (hPa)"] ?? '--';
+    document.getElementById('inmet-radiacao').textContent = data["Radiacao (KJ/m²)"] ?? '--';
+    let dataStr = data["Data"] || '--';
+    let horaStr = data["Hora (UTC)"] ? `${data["Hora (UTC)"]} UTC` : '--';
+    // Corrige para atualizar todos os elementos com a classe
+    const horaElements = document.getElementsByClassName('inmet-data-hora');
+    for (let i = 0; i < horaElements.length; i++) {
+        horaElements[i].textContent = `Data: ${dataStr} | Hora: ${horaStr}`;
+    }
+}
+
+function fetchLatestInmetData() {
+    fetch('/latest-inmet')
+        .then((response) => response.json())
+        .then((data) => {
+            if (!data || Object.keys(data).length === 0) {
+                updateInmetCards({});
+                return;
+            }
+            updateInmetCards(data);
+        })
+        .catch(() => {
+            updateInmetCards({});
+        });
+}
+
 // Obter o ID da área da URL atual (se existir)
 function getCurrentAreaId() {
     const path = window.location.pathname;
@@ -156,6 +186,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Default if no area in URL and not set by data yet
         areaDropdown.textContent = `Área: Todas`;
     }
+
+    fetchLatestInmetData(); // Busca INMET ao carregar
+    setInterval(fetchLatestInmetData, 10000); // Atualiza INMET a cada 10s
 });
 // Inicializar com a área atual
 const currentAreaId = getCurrentAreaId();
