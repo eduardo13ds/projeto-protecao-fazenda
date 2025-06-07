@@ -29,24 +29,17 @@ def index(area_id=None):
     Returns:
         str: Rendered HTML template.
     """
-    # Get the latest data and process it
-    # Pass area_id to get_latest_data if you want initial data filtered
-    # For the template, we'll let JavaScript handle the primary data display
-    # but we can pass the current_area_name for the header.
-
-    data = mqtt_client.get_latest_data(area_id) # Get data for initial render if needed for other parts
-
+    # Initial data for area name display in header
     current_area_name = None
     if area_id is not None:
         current_area_name = AREA_NAMES.get(area_id, f"Área {area_id}")
-    elif data and 'area' in data: # If no area_id in URL, try from initial data
-        current_area_name = AREA_NAMES.get(data['area'], f"Área {data['area']}")
     else:
-        current_area_name = "Todas" # Default if no area_id and no area in initial data
+        # For the main page, JavaScript will handle fetching global or specific data.
+        # The header might default to "Todas" or the first detected alert area by JS.
+        current_area_name = "Todas"
 
-    # The 'data' passed here is for initial render. JavaScript will fetch frequently.
-    # 'current_area' is used by the template, esp. header.
-    return render_template('index.html', data=data, current_area=area_id, current_area_name=current_area_name)
+    # The 'data' passed here is minimal. JavaScript handles the dynamic content.
+    return render_template('index.html', current_area=area_id, current_area_name=current_area_name)
 
 @main.route('/painel_alertas')
 def painel_alertas():
@@ -60,34 +53,39 @@ def latest_data_endpoint(area_id=None):
     """Get the latest data from MQTT.
 
     Args:
-        area_id (int, optional): ID da área a ser monitorada. Se não for fornecido,
-                                retorna dados de todas as áreas.
+        area_id (int, optional): ID da área a ser monitorada.
+                                Se não for fornecido, retorna uma lista de todos os alertas ativos.
 
     Returns:
-        Response: JSON response with the latest data.
+        Response: JSON response with the latest data for a specific area
+                  or a list of active alerts.
     """
-    # Get the latest data from MQTT client, already filtering by area
-    data = mqtt_client.get_latest_data(area_id)
+    if area_id is not None:
+        data = mqtt_client.get_latest_data(area_id)
+        # Simulate if no specific data for an area, but keep structure
+        if not data:
+             data = {
+                "adc_value": 0, "area": area_id, "current_mA": 0, "humidade": 0,
+                "probabilidade": 100, "razoes": ["Sem dados para esta área."], "temperatura": 0, "voltage": 0
+            }
+        # print(f"Requisição para área {area_id}, retornando dados: {data}") # Debug
+        return jsonify(data)
+    else:
+        # Return all active alerts
+        all_data = mqtt_client.get_all_latest_data() # Assumes you add this method to MQTTClient
+        active_alerts = []
+        for area_data_id, data_item in all_data.items():
+            # Define your condition for an "active alert"
+            # For example, probability > 75
+            if data_item and data_item.get("probabilidade", 0) > 75:
+                # Ensure area is part of the data_item if not already
+                if 'area' not in data_item and area_data_id is not None:
+                    data_item['area'] = area_data_id
+                active_alerts.append(data_item)
+        
+        # print(f"Requisição para todas as áreas, retornando alertas ativos: {active_alerts}") # Debug
+        return jsonify(active_alerts) # Returns a list of alert objects
 
-    data = {
-        "adc_value": 3528,
-        "area": 1,
-        "current_mA": 28.43,
-        "humidade": 55.4,
-        "probabilidade": 90,
-        "razoes": [
-            "Umidade baixa: 55.4%",
-            "Queda significativa de temperatura: 3.0500000000000007\u00b0C"
-        ],
-        "temperatura": 22.04,
-        "voltage": 2.843076923076923
-    }
-
-
-    # Adicionar um log para depuração
-    print(f"Recebido requisição para área {area_id}, retornando dados: {data}")
-
-    return jsonify(data)
 
 @main.route('/latest-inmet', methods=['GET'])
 def latest_inmet_endpoint():

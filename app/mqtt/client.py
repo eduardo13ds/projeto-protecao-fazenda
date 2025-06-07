@@ -1,10 +1,10 @@
 """
 MQTT client module for handling MQTT connections and message processing.
 """
+
 import json
 import ssl
 import paho.mqtt.client as mqtt
-
 
 # Global variable to store the latest data received from MQTT, organized by area
 latest_data_by_area = {}
@@ -105,6 +105,12 @@ class MQTTClient:
             if self.app:
                 self.app.logger.error(f"Error processing MQTT message: {e}")
 
+    def get_all_latest_data(self):
+        """Get all latest data received from MQTT, organized by area."""
+        global latest_data_by_area
+        return latest_data_by_area.copy()  # Retorna uma cópia para evitar modificações externas
+    
+
     def get_latest_data(self, area_id=None):
         """Get the latest data received from MQTT.
 
@@ -118,8 +124,13 @@ class MQTTClient:
         global latest_data, latest_data_by_area
 
         if area_id is not None:
-            # Converter para inteiro, pois a área pode vir como string do JSON
-            return latest_data_by_area.get(int(area_id), {})
+            try:
+                return latest_data_by_area.get(int(area_id), {})
+            except ValueError:
+                print(f"Erro: ID da área '{area_id}' não é um número válido.")
+                if self.app:
+                    self.app.logger.error(f"Invalid area ID: {area_id}")
+                return {}
 
         return latest_data
 
@@ -127,7 +138,6 @@ class MQTTClient:
         """Retorna o último dado recebido do INMET via MQTT."""
         global latest_inmet_data
         return latest_inmet_data
-
 
 # Create a singleton instance
 mqtt_client = MQTTClient()

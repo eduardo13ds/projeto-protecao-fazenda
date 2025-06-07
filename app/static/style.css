@@ -274,3 +274,46 @@ canvas {
 }
 
 
+/* In app/static/style.css */
+
+/* ... (your existing styles) ... */
+
+.alert-card-dynamic {
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+.alert-card-dynamic:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1) !important;
+}
+
+.alert-card-dynamic .card-header {
+    font-size: 1.05rem;
+}
+
+.alert-card-dynamic .badge {
+    font-size: 0.9em;
+}
+
+/* Example background colors based on border - can be more sophisticated */
+.alert-card-dynamic.border-danger {
+    background-color: #fff5f5; /* Very light red */
+}
+.alert-card-dynamic.border-danger .card-header {
+    color: #c0392b;
+}
+
+
+.alert-card-dynamic.border-warning {
+    background-color: #fff8e1; /* Very light orange */
+}
+.alert-card-dynamic.border-warning .card-header {
+    color: #f39c12;
+}
+
+.alert-card-dynamic.border-info {
+    background-color: #e3f2fd; /* Very light blue */
+}
+.alert-card-dynamic.border-info .card-header {
+    color: #2980b9;
+}
