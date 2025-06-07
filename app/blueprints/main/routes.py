@@ -66,7 +66,7 @@ def latest_data_endpoint(area_id=None):
         if not data:
              data = {
                 "adc_value": 0, "area": area_id, "current_mA": 0, "humidade": 0,
-                "probabilidade": 100, "razoes": ["Sem dados para esta área."], "temperatura": 0, "voltage": 0
+                "probabilidade": 0, "razoes": ["Sem dados para esta área."], "temperatura": 0, "voltage": 0
             }
         # print(f"Requisição para área {area_id}, retornando dados: {data}") # Debug
         return jsonify(data)

@@ -1,3 +1,12 @@
+// Mapeamento de IDs de área para nomes
+const AREA_NAMES = {
+    1: "Central",
+    2: "Norte",
+    3: "Sul",
+    4: "Leste",
+    5: "Oeste"
+};
+
 function updateCardColors(value, elementId, thresholds, descriptionElementId) {
     const card = document.getElementById(elementId);
     const description = document.getElementById(descriptionElementId);
@@ -15,9 +24,10 @@ function updateCardColors(value, elementId, thresholds, descriptionElementId) {
         description.textContent = `${value} - Crítico`;
     }
 }
+
 function fetchLatestData(areaId = null) {
     let url = "/latest-data";
-    if (areaId !== null && areaId !== undefined) { // Check for undefined too
+    if (areaId !== null && areaId !== undefined) {
         url += `/${areaId}`;
     }
 
@@ -27,34 +37,45 @@ function fetchLatestData(areaId = null) {
             const globalAlertBanner = document.getElementById("global-multiple-alerts-banner");
             const headerAlertStatus = document.getElementById("header-alert-status");
 
-            if (areaId !== null && areaId !== undefined) { // Specific area view (index.html with /<area_id>)
-                if (Object.keys(data).length === 0 || data.probabilidade === undefined) {
-                    console.log(`Sem dados para a área ${areaId}`);
-                    // Clear or set placeholders for card data
+            // Função auxiliar para mostrar alerta global se não houver local
+            function showGlobalAlertFallback() {
+                fetch("/latest-data")
+                    .then(resp => resp.json())
+                    .then(globalData => {
+                        updateCustomAlert(globalData, true);
+                    });
+            }
+
+            if (areaId !== null && areaId !== undefined) {
+                // Vista específica de área
+                if (Object.keys(data).length === 0 || data.probabilidade === undefined || data.probabilidade <= 75) {
+                    // Não há alerta crítico local, buscar global
+                    showGlobalAlertFallback();
+                    // Limpar placeholders dos cards
                     document.getElementById("probabilidade-texto").textContent = "--% - Indefinido";
                     document.getElementById("temperatura-texto").textContent = "--°C - Indefinido";
                     document.getElementById("humidade-texto").textContent = "--% - Indefinido";
                     document.getElementById("campo-eletrico-texto").textContent = "-- mA - Indefinido";
                     const listaRazoes = document.getElementById("razoes-lista");
                     if (listaRazoes) listaRazoes.innerHTML = "<li class='list-group-item'>Sem dados de razões.</li>";
-                    // If there's a specific single alert banner for area view (not the global one)
-                    // you might hide it here. For now, we assume index.html only uses the global banner.
-
-                    // Update header alert status if needed for single area view specifically
-                    // This part might need more thought if the global banner is also on single area view.
-                    // For simplicity, let's assume the header reflects global state.
-                    // We'll handle global alert state below based on whether ANY alert is active.
-
-                    return; // Exit if no specific area data.
+                    return;
                 }
 
-                // Update cards for the specific area
+                // Se tem alerta crítico local, buscar global para saber se há outros
+                fetch("/latest-data")
+                    .then(resp => resp.json())
+                    .then(globalData => {
+                        // Filtrar alertas críticos diferentes da área atual
+                        const otherCritical = Array.isArray(globalData) ? globalData.filter(a => a.probabilidade > 75 && a.area !== areaId) : [];
+                        updateCustomAlert(data, false, otherCritical.length);
+                    });
+
                 updateCardColors(data.current_mA || 0, "card-campo-eletrico", { low: 10, medium: 20 }, "campo-eletrico-texto");
                 updateCardColors(data.temperatura || 0, "card-temperatura", { low: 20, medium: 30 }, "temperatura-texto");
                 updateCardColors(data.humidade || 0, "card-humidade", { low: 50, medium: 70 }, "humidade-texto");
                 updateCardColors(data.probabilidade || 0, "card-probabilidade", { low: 50, medium: 75 }, "probabilidade-texto");
 
-
+                // Atualizar lista de razões
                 const listaRazoes = document.getElementById("razoes-lista");
                 if (listaRazoes) {
                     if (Array.isArray(data.razoes) && data.razoes.length > 0) {
@@ -69,34 +90,38 @@ function fetchLatestData(areaId = null) {
                         listaRazoes.innerHTML = "<li class='list-group-item'>Nenhuma razão específica no momento.</li>";
                     }
                 }
-                // The global alert banner logic is handled when areaId is null.
-                // For single area view, the cards are updated, the global banner reflects overall state.
 
-            } else { // Global view (index.html without /<area_id> or for header status)
-                     // data here is expected to be an ARRAY of active alerts.
+            } else {
+                // Vista global
                 if (Array.isArray(data) && data.length > 0) {
-                    // One or more alerts are active
+                    updateCustomAlert(data, true);
                     if (globalAlertBanner) globalAlertBanner.classList.remove("d-none");
                     if (headerAlertStatus) {
                         headerAlertStatus.textContent = "Alerta(s) Ativo(s)!";
                         headerAlertStatus.classList.remove("alert-inactive");
                         headerAlertStatus.classList.add("alert-active");
                     }
-                    // If on main page (no areaId) and you still want to show *some* default cards:
-                    // You could pick the first alert, or an average, or a summary.
-                    // For simplicity, let's assume the cards on main page show "no specific area" or are less prominent
-                    // when multiple alerts are active, encouraging user to go to the panel.
-                    // Or, if you are on the main page (currentAreaId is null), you might want to update
-                    // the cards with the data of the *first* active alert for display purposes, or a summary.
-                    // Let's update with the first alert for now if no area is selected.
-                    if (window.location.pathname === '/' || window.location.pathname === '/index.html') { // Only if truly on main page
+
+                    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
                         const firstAlert = data[0];
-                        updateCardColors(firstAlert.current_mA || 0, "card-campo-eletrico", { low: 10, medium: 20 }, "campo-eletrico-texto");
-                        updateCardColors(firstAlert.temperatura || 0, "card-temperatura", { low: 20, medium: 30 }, "temperatura-texto");
-                        updateCardColors(firstAlert.humidade || 0, "card-humidade", { low: 50, medium: 70 }, "humidade-texto");
-                        updateCardColors(firstAlert.probabilidade || 0, "card-probabilidade", { low: 50, medium: 75 }, "probabilidade-texto");
+                        updateCardColors(firstAlert.current_mA || 0, "card-campo-eletrico", {
+                            low: 10,
+                            medium: 20
+                        }, "campo-eletrico-texto");
+                        updateCardColors(firstAlert.temperatura || 0, "card-temperatura", {
+                            low: 20,
+                            medium: 30
+                        }, "temperatura-texto");
+                        updateCardColors(firstAlert.humidade || 0, "card-humidade", {
+                            low: 50,
+                            medium: 70
+                        }, "humidade-texto");
+                        updateCardColors(firstAlert.probabilidade || 0, "card-probabilidade", {
+                            low: 50,
+                            medium: 75
+                        }, "probabilidade-texto");
                         const listaRazoes = document.getElementById("razoes-lista");
-                         if (listaRazoes) {
+                        if (listaRazoes) {
                             if (Array.isArray(firstAlert.razoes) && firstAlert.razoes.length > 0) {
                                 listaRazoes.innerHTML = "";
                                 firstAlert.razoes.forEach((razao) => {
@@ -111,20 +136,18 @@ function fetchLatestData(areaId = null) {
                         }
                         const areaDropdown = document.getElementById("areaDropdown");
                         if (areaDropdown && firstAlert.area !== undefined) {
-                             areaDropdown.textContent = `Área: ${firstAlert.area} (Primeiro Alerta)`;
+                            areaDropdown.textContent = `Área: ${firstAlert.area} (Primeiro Alerta)`;
                         }
                     }
 
-
                 } else {
-                    // No active alerts globally, or data is not an array (error or single area with no alert)
+                    updateCustomAlert(null);
                     if (globalAlertBanner) globalAlertBanner.classList.add("d-none");
                     if (headerAlertStatus) {
                         headerAlertStatus.textContent = "Sem Alertas";
                         headerAlertStatus.classList.remove("alert-active");
                         headerAlertStatus.classList.add("alert-inactive");
                     }
-                    // If on main page (no areaId), clear cards or show placeholders
                     if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
                         document.getElementById("probabilidade-texto").textContent = "--% - Indefinido";
                         document.getElementById("temperatura-texto").textContent = "--°C - Indefinido";
@@ -132,37 +155,33 @@ function fetchLatestData(areaId = null) {
                         document.getElementById("campo-eletrico-texto").textContent = "-- mA - Indefinido";
                         const listaRazoes = document.getElementById("razoes-lista");
                         if (listaRazoes) listaRazoes.innerHTML = "<li class='list-group-item'>Sem dados de razões.</li>";
-                         const areaDropdown = document.getElementById("areaDropdown");
+                        const areaDropdown = document.getElementById("areaDropdown");
                         if (areaDropdown) {
-                             areaDropdown.textContent = `Área: Todas`;
+                            areaDropdown.textContent = `Área: Todas`;
                         }
                     }
                 }
             }
 
-            // Update area dropdown text based on areaId (this should be more robust if area names are needed)
+            // Atualizar dropdown de área
             const areaDropdown = document.getElementById("areaDropdown");
             if (areaDropdown) {
-                const currentPathAreaId = getCurrentAreaId(); // Get area from URL
-                const areaNames = {1: "Central", 2: "Norte", 3: "Sul", 4: "Leste", 5: "Oeste", null: "Todas"};
+                const currentPathAreaId = getCurrentAreaId();
                 let displayAreaName = "Todas";
                 if (currentPathAreaId !== null) {
-                    displayAreaName = areaNames[currentPathAreaId] || `Área ${currentPathAreaId}`;
+                    displayAreaName = AREA_NAMES[currentPathAreaId] || `Área ${currentPathAreaId}`;
                 }
                 areaDropdown.textContent = `Área: ${displayAreaName}`;
             }
-
-
         })
         .catch((error) => {
             console.error("Error fetching data:", error);
-            const globalAlertBanner = document.getElementById("global-multiple-alerts-banner");
-            const headerAlertStatus = document.getElementById("header-alert-status");
-            if (globalAlertBanner) globalAlertBanner.classList.add("d-none"); // Hide on error too
+            updateCustomAlert(null);
+            if (globalAlertBanner) globalAlertBanner.classList.add("d-none");
             if (headerAlertStatus) {
                 headerAlertStatus.textContent = "Erro Conexão";
                 headerAlertStatus.classList.remove("alert-inactive");
-                headerAlertStatus.classList.add("alert-active"); // Style as active to draw attention to error
+                headerAlertStatus.classList.add("alert-active");
             }
         });
 }
@@ -182,9 +201,9 @@ function updateInmetCards(data) {
         let rawHora = String(data["Hora (UTC)"]);
         if (rawHora.length === 3) rawHora = "0" + rawHora; // Pad 3-digit times like "100" to "0100"
         if (rawHora.length === 4) { // Expected format e.g. "0100"
-            displayHora = `${rawHora.substring(0,2)}:${rawHora.substring(2,4)} UTC`;
+            displayHora = `${rawHora.substring(0, 2)}:${rawHora.substring(2, 4)} UTC`;
         } else {
-             displayHora = `${rawHora} UTC`; // Fallback for unexpected format
+            displayHora = `${rawHora} UTC`; // Fallback for unexpected format
         }
     }
 
@@ -219,7 +238,7 @@ function getCurrentAreaId() {
     return match ? parseInt(match[1]) : null;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const currentAreaId = getCurrentAreaId();
 
     // Fetch data for the specific area if URL indicates, or global alerts if not.
@@ -268,7 +287,7 @@ function createAlertBox(data) {
     // Reuse styling from alert.html's .custom-heavy-rain-alert or define new ones
     // This function creates a DOM element for a single alert.
     // For simplicity, using a structure similar to the global alert but with details.
-    const areaNames = { 1: "Central", 2: "Norte", 3: "Sul", 4: "Leste", 5: "Oeste" };
+    const areaNames = {1: "Central", 2: "Norte", 3: "Sul", 4: "Leste", 5: "Oeste"};
     const areaName = areaNames[data.area] || `Área ${data.area}`;
 
     const colDiv = document.createElement("div");
@@ -305,8 +324,12 @@ function createAlertBox(data) {
             <p class="card-text mb-1 mt-2"><strong>Razões:</strong></p>
             <ul class="list-group list-group-flush small">${reasonsHtml}</ul>
         </div>
-        <div class="card-footer bg-transparent text-muted small">
-            Última atualização: ${new Date().toLocaleTimeString()} </div>
+        <div class="card-footer bg-transparent text-muted small d-flex justify-content-between align-items-center">
+            <span>Última atualização: ${new Date().toLocaleTimeString()}</span>
+            <button class="protocol-button ms-2" type="button">
+                <i class="fas fa-play me-1"></i>Iniciar Protocolo
+            </button>
+        </div>
     `;
     // Potential styling for .alert-card-dynamic in style.css if needed
     // .alert-card-dynamic.border-danger { background-color: #ffebee; }
@@ -326,3 +349,65 @@ function updateAlert(prob, umid, campo, area) {
     // For the global banner on index.html, it's now just a notification.
 }
 */
+
+function updateCustomAlert(data, showAll = false, otherCriticalCount = 0) {
+    const customHeavyRainAlert = document.getElementById("custom-heavy-rain-alert");
+    const verMaisButton = document.getElementById("ver-mais-alertas");
+    
+    if (!customHeavyRainAlert) return;
+
+    // Se não houver dados ou não for um array quando showAll=true
+    if (!data || (showAll && !Array.isArray(data)) || (!showAll && !data.probabilidade)) {
+        customHeavyRainAlert.classList.add("d-none");
+        if (verMaisButton) verMaisButton.classList.add("d-none");
+        return;
+    }
+
+    // Processar dados baseado no modo (único alerta ou múltiplos)
+    if (showAll) {
+        // Filtrar alertas críticos
+        const criticalAlerts = data.filter(alert => alert.probabilidade > 75);
+        
+        if (criticalAlerts.length > 0) {
+            const firstAlert = criticalAlerts[0];
+            customHeavyRainAlert.classList.remove("d-none");
+            
+            // Atualizar informações do primeiro alerta
+            document.getElementById("alert-area").textContent = `${firstAlert.area} (${AREA_NAMES[firstAlert.area] || ''})`;
+            document.getElementById("alert-probabilidade").textContent = `${firstAlert.probabilidade}%`;
+            document.getElementById("alert-umidade").textContent = `${firstAlert.humidade}%`;
+            document.getElementById("alert-campo-eletrico").textContent = `${firstAlert.current_mA || '--'} mA`;
+
+            // Mostrar botão ver mais se houver mais alertas
+            if (criticalAlerts.length > 1 && verMaisButton) {
+                verMaisButton.classList.remove("d-none");
+                document.getElementById("num-alertas").textContent = criticalAlerts.length - 1;
+            } else if (verMaisButton) {
+                verMaisButton.classList.add("d-none");
+            }
+        } else {
+            customHeavyRainAlert.classList.add("d-none");
+            if (verMaisButton) verMaisButton.classList.add("d-none");
+        }
+    } else {
+        // Modo alerta único
+        if (data.probabilidade > 75) {
+            customHeavyRainAlert.classList.remove("d-none");
+            document.getElementById("alert-area").textContent = `${data.area} (${AREA_NAMES[data.area] || ''})`;
+            document.getElementById("alert-probabilidade").textContent = `${data.probabilidade}%`;
+            document.getElementById("alert-umidade").textContent = `${data.humidade}%`;
+            document.getElementById("alert-campo-eletrico").textContent = `${data.current_mA || '--'} mA`;
+            
+            // Mostrar botão ver mais se houver outros alertas críticos
+            if (otherCriticalCount > 0 && verMaisButton) {
+                verMaisButton.classList.remove("d-none");
+                document.getElementById("num-alertas").textContent = otherCriticalCount;
+            } else if (verMaisButton) {
+                verMaisButton.classList.add("d-none");
+            }
+        } else {
+            customHeavyRainAlert.classList.add("d-none");
+            if (verMaisButton) verMaisButton.classList.add("d-none");
+        }
+    }
+}
