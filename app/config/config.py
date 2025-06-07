@@ -7,6 +7,10 @@ class Config:
     DEBUG = False
     SECRET_KEY = 'dev-key-change-in-production'  # Should be changed in production
     
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:@localhost:3306/sistema_alerta_chuvas'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False # Opcional, mas recomendado para desativar avisos
+
+
     # MQTT Configuration
     MQTT_BROKER = 'fd2522b769fc4f16bb479a6cac3dcb7b.s1.eu.hivemq.cloud'
     MQTT_PORT = 8883
