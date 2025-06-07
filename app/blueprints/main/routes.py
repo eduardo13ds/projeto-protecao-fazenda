@@ -1,10 +1,10 @@
 """
 Routes for the main blueprint.
 """
-from flask import Blueprint, render_template, jsonify
-
+from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for
+from flask_login import current_user, login_user, logout_user, login_required
 from app.mqtt.client import mqtt_client
-
+from app.forms import LoginForm # Importe o formulário
 # Create blueprint
 main = Blueprint('main', __name__)
 
@@ -46,6 +46,10 @@ def painel_alertas():
     """Render the alerts page."""
     return render_template('alertas.html')
 
+@main.route('/login')
+def login():
+    """Render the login page."""
+    return render_template('login.html')
 
 @main.route('/latest-data', methods=['GET'])
 @main.route('/latest-data/<int:area_id>', methods=['GET'])
@@ -92,3 +96,35 @@ def latest_inmet_endpoint():
     """Retorna o último dado recebido do INMET via MQTT."""
     data = mqtt_client.get_latest_inmet_data()
     return jsonify(data)
+
+# Rota de Login
+@main.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    
+    form = LoginForm()
+    if form.validate_on_submit():
+        # Lógica de busca do usuário no banco de dados
+        # user = db.session.scalar(select(Usuario).where(Usuario.Nome_Usuario == form.username.data))
+
+        # Placeholder - substitua pela lógica real
+        user = None # Busque o usuário no seu DB aqui
+
+        if user is None or not user.check_password(form.password.data):
+            flash('Nome de usuário ou senha inválidos', 'danger')
+            return redirect(url_for('main.login'))
+        
+        login_user(user, remember=form.remember_me.data)
+        flash('Login realizado com sucesso!', 'success')
+        return redirect(url_for('main.index'))
+        
+    return render_template('login.html', title='Login', form=form)
+
+# Rota de Logout
+@main.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('main.index'))
+
+# Adicione outras rotas aqui (registro, etc.)
