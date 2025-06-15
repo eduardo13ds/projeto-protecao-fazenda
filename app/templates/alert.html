@@ -1,59 +1,86 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <style>
+    /*
+     * BANNER DE ALERTA GLOBAL - ESTILO "COLHEITA DIGITAL"
+     */
     .global-alert-banner {
-        background: linear-gradient(90deg, #e57373 0%, #d32f2f 100%); /* Red gradient for alert */
-        color: white;
-        border-radius: 0.75rem;
+        /* Base consistente com os outros painéis */
+        background-color: var(--cor-fundo-painel);
+        color: var(--cor-texto-principal);
+        backdrop-filter: blur(5px);
+        
+        /* A urgência vem da borda e da animação */
+        border: 1px solid var(--cor-alerta);
+        border-radius: 12px; /* Consistente com os cards-tematicos */
+        
         padding: 0.75rem 1.25rem;
+        margin-bottom: 1.5rem;
         display: flex;
         align-items: center;
-        justify-content: space-between; /* Pushes items to ends */
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        margin-bottom: 1rem; /* Add some margin below */
+        justify-content: space-between;
+
+        /* A ANIMAÇÃO QUE DÁ PERSONALIDADE E URGÊNCIA */
+        animation: pulse-alert 2s infinite ease-in-out;
     }
 
-    .global-alert-banner.slim { /* This class might not be needed if always slim */
-        padding: 0.5rem 1rem;
-        font-size: 0.95rem;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    @keyframes pulse-alert {
+        0% {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4), 0 0 5px var(--cor-alerta);
+        }
+        50% {
+            /* O brilho do alerta se expande, chamando a atenção */
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.6), 0 0 15px var(--cor-alerta);
+        }
+        100% {
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.4), 0 0 5px var(--cor-alerta);
+        }
     }
 
     .global-alert-banner .alert-icon-main {
-        font-size: 1.5rem; /* Slightly smaller */
-        margin-right: 0.75rem;
+        font-size: 1.6rem;
+        margin-right: 1rem;
+        color: var(--cor-alerta); /* Ícone com a cor de perigo */
+        /* Pequeno brilho no próprio ícone */
+        text-shadow: 0 0 8px rgba(255, 71, 87, 0.7);
     }
 
     .global-alert-banner .alert-text {
-        font-size: 1rem;
-        font-weight: 500;
+        font-size: 1.05rem;
+        font-weight: 700; /* Mais destaque para a mensagem */
     }
 
+    /* O botão de ação, agora totalmente integrado ao tema */
     .global-alert-banner .view-alerts-button {
-        background-color: #ffffff;
-        color: #d32f2f; /* Match red */
+        background-color: var(--cor-alerta);
+        color: #ffffff;
         border: none;
-        padding: 0.4rem 0.8rem;
-        border-radius: 0.5rem;
-        font-weight: 600;
-        font-size: 0.85rem;
-        text-decoration: none; /* For <a> tag */
-        transition: all 0.3s ease;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-decoration: none;
+        transition: all 0.2s ease;
         white-space: nowrap;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .global-alert-banner .view-alerts-button:hover {
-        background-color: #ffebee; /* Lighter red shade */
+        /* Efeito de brilho ao passar o mouse */
+        filter: brightness(1.2);
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+        transform: translateY(-2px);
     }
 
-    /* Hide by default */
+    /* Regra para esconder, já que você a usa */
     .d-none {
       display: none !important;
     }
 </style>
 
 <div class="container">
-    <div class="global-alert-banner d-flex align-items-center justify-content-between d-none" id="global-multiple-alerts-banner">
-        <div>
+    <div class="global-alert-banner d-none" id="global-multiple-alerts-banner">
+        <div class="d-flex align-items-center">
             <i class="fas fa-exclamation-triangle alert-icon-main"></i>
             <span class="alert-text" id="global-alert-message">Alerta(s) Ativo(s)!</span>
         </div>

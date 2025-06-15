@@ -66,11 +66,11 @@ class MQTTClient:
             self.app.logger.info("Connected to MQTT broker with reason code: %s", reasonCode)
             
         # Inscrever-se no tópico para receber dados dos sensores
-        client.subscribe("sensor/dados", qos=1)
+        client.subscribe("sensor/dados", qos=0)
         if self.app:
             self.app.logger.info("Inscrito no tópico 'sensor/dados'")
         # Novo: inscreve também no tópico do INMET
-        client.subscribe("inmet/dados", qos=1)
+        client.subscribe("inmet/dados", qos=0)
         if self.app:
             self.app.logger.info("Inscrito no tópico 'inmet/dados'")
 

@@ -1,40 +1,76 @@
-from flask import Flask
-from flask_login import LoginManager
-from flask_sqlalchemy import SQLAlchemy # Importe SQLAlchemy
-from app.config.config import config
+# app/__init__.py
 
-# Crie as instâncias fora da função create_app
-db = SQLAlchemy()
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from app.config.config import config
+from app.mqtt.client import mqtt_client
+from .extensions import db
+
+# --------------------------------------------------------------------
+# 1. Instancie as extensões fora da factory
+#    Isso permite que outros arquivos (como os modelos) as importem.
+# --------------------------------------------------------------------
 login_manager = LoginManager()
-login_manager.login_view = 'main.login'
+
+# Define para qual rota o usuário não logado será redirecionado.
+# O formato é 'nome_do_blueprint.nome_da_funcao_da_rota'
+# Com base no seu login_route.py, o blueprint se chama 'login'.
+login_manager.login_view = 'login.login'
 login_manager.login_message = 'Por favor, faça login para acessar esta página.'
 login_manager.login_message_category = 'info'
 
+
+# --------------------------------------------------------------------
+# 2. DEFINIÇÃO DO USER_LOADER - A CORREÇÃO PRINCIPAL
+#    Esta função deve ser definida aqui, junto com a instância do login_manager.
+# --------------------------------------------------------------------
+# Importe o modelo de usuário para que o loader possa usá-lo.
+from .models.usuario import Usuario
+
+@login_manager.user_loader
+def load_user(user_id):
+    """
+Esta função é o "carregador de usuário". O Flask-Login a usa para
+buscar o usuário no banco de dados em cada requisição protegida,
+usando o ID que ele guardou na sessão do usuário.
+    """
+    # db.session.get() é a forma mais eficiente de buscar pela chave primária.
+    return db.session.get(Usuario, int(user_id))
+
+
+# --------------------------------------------------------------------
+# 3. A "APPLICATION FACTORY"
+#    Esta função constrói e configura a aplicação.
+# --------------------------------------------------------------------
 def create_app(config_name='default'):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
 
-    # **NOVO: Configuração do Banco de Dados**
-    # Usa as informações do seu settings.json
+    # Configuração do Banco de Dados
     db_user = "root"
-    db_password = "" # Vazio, conforme seu settings.json
+    db_password = ""
     db_host = "localhost"
     db_port = "3306"
-    db_name = "sistema_alerta_chuvas"
+    db_name = "stormguard"
     app.config['SQLALCHEMY_DATABASE_URI'] = f'mysql+pymysql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # Inicialize as extensões com o app
+    # Inicialize as extensões, conectando-as à instância da aplicação
     db.init_app(app)
     login_manager.init_app(app)
+    mqtt_client.init_app(app)
 
-    # Importe os modelos AQUI para que eles sejam registrados com o SQLAlchemy
-    from app import models
+    # Registro dos Blueprints
+    from .blueprints.main import main as main_blueprint
+    from .blueprints.errors import errors as errors_blueprint
+    from .blueprints.login import login_register as login_blueprint
+    from .blueprints.db_interaction import fazendas_bp as fazendas_blueprint
 
-    # Register blueprints
-    from app.blueprints.main import main
-    from app.blueprints.errors import errors
-    app.register_blueprint(main)
-    app.register_blueprint(errors)
+    app.register_blueprint(main_blueprint)
+    app.register_blueprint(errors_blueprint)
+    app.register_blueprint(login_blueprint)
+    app.register_blueprint(fazendas_blueprint)
 
     return app
+

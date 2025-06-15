@@ -7,20 +7,37 @@ const AREA_NAMES = {
     5: "Oeste"
 };
 
+// -----------------------------------------------------------------
+// NOVA FUNÇÃO CORRIGIDA - A SOLUÇÃO!
+// Use esta no lugar da antiga.
+// -----------------------------------------------------------------
 function updateCardColors(value, elementId, thresholds, descriptionElementId) {
     const card = document.getElementById(elementId);
     const description = document.getElementById(descriptionElementId);
 
-    if (!card || !description) return; // Element not found
+    // Se o card não for encontrado, não fazemos nada.
+    if (!card || !description) {
+        console.warn(`Elemento não encontrado: ${elementId} ou ${descriptionElementId}`);
+        return;
+    }
 
+    // 1. GARANTIMOS QUE AS CLASSES BASE ESTEJAM SEMPRE LÁ
+    // O ideal é que elas já estejam no HTML, mas esta é uma segurança extra.
+    card.classList.add("card", "card-tematico", "text-center");
+
+    // 2. LIMPAMOS APENAS AS CLASSES DE DESTAQUE ANTIGAS
+    // Isso evita que o card fique com múltiplas cores.
+    card.classList.remove("card-highlight-ok", "card-highlight-mid", "card-highlight-crit");
+
+    // 3. ADICIONAMOS A NOVA CLASSE DE DESTAQUE CORRETA
     if (value <= thresholds.low) {
-        card.className = "card text-center dynamic-card green";
-        description.textContent = `${value} - Baixo`;
+        card.classList.add("card-highlight-ok");
+        description.textContent = `${value} - Normal`;
     } else if (value <= thresholds.medium) {
-        card.className = "card text-center dynamic-card blue";
+        card.classList.add("card-highlight-mid");
         description.textContent = `${value} - Moderado`;
     } else {
-        card.className = "card text-center dynamic-card red";
+        card.classList.add("card-highlight-crit");
         description.textContent = `${value} - Crítico`;
     }
 }
@@ -58,7 +75,6 @@ function fetchLatestData(areaId = null) {
                     document.getElementById("campo-eletrico-texto").textContent = "-- mA - Indefinido";
                     const listaRazoes = document.getElementById("razoes-lista");
                     if (listaRazoes) listaRazoes.innerHTML = "<li class='list-group-item'>Sem dados de razões.</li>";
-                    return;
                 }
 
                 // Se tem alerta crítico local, buscar global para saber se há outros
@@ -70,10 +86,16 @@ function fetchLatestData(areaId = null) {
                         updateCustomAlert(data, false, otherCritical.length);
                     });
 
-                updateCardColors(data.current_mA || 0, "card-campo-eletrico", { low: 10, medium: 20 }, "campo-eletrico-texto");
-                updateCardColors(data.temperatura || 0, "card-temperatura", { low: 20, medium: 30 }, "temperatura-texto");
-                updateCardColors(data.humidade || 0, "card-humidade", { low: 50, medium: 70 }, "humidade-texto");
-                updateCardColors(data.probabilidade || 0, "card-probabilidade", { low: 50, medium: 75 }, "probabilidade-texto");
+                updateCardColors(data.current_mA || 0, "card-campo-eletrico", {
+                    low: 10,
+                    medium: 20
+                }, "campo-eletrico-texto");
+                updateCardColors(data.temperatura || 0, "card-temperatura", {low: 20, medium: 30}, "temperatura-texto");
+                updateCardColors(data.humidade || 0, "card-humidade", {low: 50, medium: 70}, "humidade-texto");
+                updateCardColors(data.probabilidade || 0, "card-probabilidade", {
+                    low: 50,
+                    medium: 75
+                }, "probabilidade-texto");
 
                 // Atualizar lista de razões
                 const listaRazoes = document.getElementById("razoes-lista");
@@ -353,7 +375,7 @@ function updateAlert(prob, umid, campo, area) {
 function updateCustomAlert(data, showAll = false, otherCriticalCount = 0) {
     const customHeavyRainAlert = document.getElementById("custom-heavy-rain-alert");
     const verMaisButton = document.getElementById("ver-mais-alertas");
-    
+
     if (!customHeavyRainAlert) return;
 
     // Se não houver dados ou não for um array quando showAll=true
@@ -367,11 +389,11 @@ function updateCustomAlert(data, showAll = false, otherCriticalCount = 0) {
     if (showAll) {
         // Filtrar alertas críticos
         const criticalAlerts = data.filter(alert => alert.probabilidade > 75);
-        
+
         if (criticalAlerts.length > 0) {
             const firstAlert = criticalAlerts[0];
             customHeavyRainAlert.classList.remove("d-none");
-            
+
             // Atualizar informações do primeiro alerta
             document.getElementById("alert-area").textContent = `${firstAlert.area} (${AREA_NAMES[firstAlert.area] || ''})`;
             document.getElementById("alert-probabilidade").textContent = `${firstAlert.probabilidade}%`;
@@ -397,7 +419,7 @@ function updateCustomAlert(data, showAll = false, otherCriticalCount = 0) {
             document.getElementById("alert-probabilidade").textContent = `${data.probabilidade}%`;
             document.getElementById("alert-umidade").textContent = `${data.humidade}%`;
             document.getElementById("alert-campo-eletrico").textContent = `${data.current_mA || '--'} mA`;
-            
+
             // Mostrar botão ver mais se houver outros alertas críticos
             if (otherCriticalCount > 0 && verMaisButton) {
                 verMaisButton.classList.remove("d-none");
@@ -410,4 +432,62 @@ function updateCustomAlert(data, showAll = false, otherCriticalCount = 0) {
             if (verMaisButton) verMaisButton.classList.add("d-none");
         }
     }
+}
+
+import * as THREE from 'https://unpkg.com/three@0.165.0/build/three.module.js';
+
+const container = document.getElementById('glass-container');
+
+if (container) {
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    const scene = new THREE.Scene();
+
+    // --- MUDANÇA 1: Usar Câmera Ortográfica para UI ---
+    // Este tipo de câmera não tem perspectiva, o que é ideal para um efeito de fundo plano.
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 10);
+
+    const renderer = new THREE.WebGLRenderer({alpha: true, antialias: true});
+    renderer.setSize(width, height);
+    container.appendChild(renderer.domElement);
+
+
+    // --- MUDANÇA 2: Usar um Plano (PlaneGeometry) em vez de uma esfera ---
+    // Isso criará uma "folha de vidro" que cobre toda a navbar.
+    const geometry = new THREE.PlaneGeometry(2, 2); // O tamanho (2,2) preenche a câmera ortográfica
+
+    const material = new THREE.MeshPhysicalMaterial({
+        // Você pode diminuir os valores para um efeito mais sutil
+        roughness: 0.2,
+        transmission: 1.0,
+        thickness: 1.0, // Uma espessura menor pode ficar melhor em uma navbar
+        ior: 1.2,       // Um IOR menor causa menos distorção
+    });
+
+    const glassPlane = new THREE.Mesh(geometry, material);
+    scene.add(glassPlane);
+
+
+    // --- Lidando com redimensionamento (essencial para a navbar responsiva do Bootstrap) ---
+    const resizeObserver = new ResizeObserver(entries => {
+        const entry = entries[0];
+        const newWidth = entry.contentRect.width;
+        const newHeight = entry.contentRect.height;
+
+        renderer.setSize(newWidth, newHeight);
+
+        // Para a câmera ortográfica, não mexemos no 'aspect'.
+        // Podemos ajustar a escala do plano se quisermos, mas geralmente não é necessário.
+    });
+    resizeObserver.observe(container);
+
+
+    // Loop de renderização (pode ser mais simples, sem rotação)
+    function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+    }
+
+    animate();
 }

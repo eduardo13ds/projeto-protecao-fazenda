@@ -1,319 +1,166 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400..800&display=swap');
+/* --- TEMA: COLHEITA DIGITAL --- */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&display=swap');
 
+:root {
+    /* A NOVA PALETA DE CORES */
+    --cor-fundo-painel: rgba(20, 22, 20, 0.85); /* Verde muito escuro, quase preto, com transparência */
+    --cor-borda-painel: rgba(51, 255, 153, 0.3); /* Borda neon sutil */
+    --cor-brilho-painel: rgba(51, 255, 153, 0.1); /* Brilho neon para o hover */
+    --cor-texto-principal: #e8e8e8; /* Branco suave, confortável para leitura */
+    --cor-texto-secundario: #a0a0a0; /* Cinza claro para informações de apoio */
+    --cor-destaque-neon: #33ff99; /* O nosso verde elétrico! */
+    --cor-alerta: #ff4757;
+}
 
 html {
-    font-size: 14px; /* This makes 1rem = 14.4px */
+    font-size: 14px;
 }
 
-#razoes-lista {
-    max-height: 100px; /* ou altura fixa que você quiser */
-    min-height: 100px; /* ou altura fixa que você quiser */
-    overflow-y: auto;
-}
-
-/* --- NAVBAR --- */
-nav {
-    margin-bottom: 1rem;
-    border-bottom-right-radius: 10px;
-    border-bottom-left-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.68); /* cinza claro neutro */
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-}
-
-.navbar-brand,
-.navbar-brand * {
-    color: #2d3436; /* texto escuro */
-}
-
-.nav-link {
-    color: #2d3436;
-    background-color: transparent;
-    transition: background-color 0.25s, color 0.25s;
-}
-
-.nav-link:hover,
-.nav-link:focus {
-    background-color: #d6e9f8; /* azul bem leve */
-    color: #1d3557; /* azul escuro para hover */
-}
-
-a.nav-link.ms-lg-3 {
-    background-color: #457b9d; /* azul médio */
-    color: #f1faee !important;
-    font-weight: 600;
-    transition: background-color 0.3s;
-}
-
-a.nav-link.ms-lg-3:hover {
-    background-color: #1d3557; /* azul escuro */
-    color: #f1faee !important;
-}
-
-/* --- DROPDOWNS --- */
-.dropdown-menu {
-    background-color: #f1f3f5;
-    border: 1px solid #cfd8dc;
-}
-
-.dropdown-item {
-    color: #2d3436;
-}
-
-.dropdown-item:hover {
-    background-color: #a8dadc; /* azul pastel */
-    color: #1d3557;
-}
-
-/* --- BODY --- */
 body {
-    padding: 0 5vw;
-    background-color: #f0f2f5;
-    color: #2d3436;
+    padding: 0 4vw;
+    /* A MÁGICA COMEÇA AQUI: O FUNDO IMERSIVO */
+    background-image: url('https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=2070&auto=format&fit=crop');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+    color: var(--cor-texto-principal);
     font-family: "Syne", sans-serif;
+    font-weight: 500;
 }
 
-/* --- CARDS --- */
-.card {
-    background-color: #ffffff;
-    border: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
-    border-radius: 0.75rem;
+/* --- O NOVO CARD TEMÁTICO --- */
+.card-tematico {
+    background-color: var(--cor-fundo-painel);
+    border: 1px solid var(--cor-borda-painel);
+    border-radius: 12px;
+    backdrop-filter: blur(5px); /* Um leve desfoque no fundo, mas sem o efeito de vidro */
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    height: 100%; /* Garante que os cards na mesma linha tenham a mesma altura */
 }
 
-.card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+.card-tematico:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 25px var(--cor-brilho-painel), 0 0 30px rgba(0, 0, 0, 0.5);
 }
 
-.card-title {
+.card-tematico .card-title {
+    color: var(--cor-destaque-neon); /* Títulos com a cor de destaque */
     font-weight: 700;
-    color: #1d3557; /* azul escuro */
+    text-shadow: 0 0 5px var(--cor-brilho-painel);
 }
 
-.card-body p,
-.card-body ul,
-.card-body li {
-    color: #495057;
+.card-tematico .card-title .bi {
+    margin-right: 0.75rem; /* Ícones dos títulos */
 }
 
-/* --- CORES DOS CARDS DINÂMICOS --- */
-.dynamic-card {
-    transition: transform 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-    color: #2d3436;
+.card-tematico .card-body p,
+.card-tematico .card-body .fs-5 {
+    color: var(--cor-texto-principal);
 }
 
-.dynamic-card.green {
-    background-color: #b7e4c7; /* verde suave */
+.card-tematico .text-muted,
+.card-tematico .small {
+    color: var(--cor-texto-secundario) !important;
 }
 
-.dynamic-card.blue {
-    background-color: #a8dadc; /* azul suave */
+/* --- HEADER PRINCIPAL REIMAGINADO --- */
+.header-principal {
+    position: sticky;
+    top: 1rem;
+    z-index: 1000;
+    margin-bottom: 2rem;
+    padding: 0.5rem 0;
+    /* O header agora compartilha o mesmo estilo dos cards para unificação */
+    background-color: var(--cor-fundo-painel);
+    border: 1px solid var(--cor-borda-painel);
+    border-radius: 16px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
 }
 
-.dynamic-card.red {
-    background-color: #ffb4a2; /* coral leve */
+/* Links e textos do Header */
+.header-principal .navbar-brand,
+.header-principal .nav-link,
+.header-principal .indicator {
+    color: var(--cor-texto-principal);
+    transition: color 0.2s ease, text-shadow 0.2s ease;
 }
 
-.dynamic-card.yellow {
-    background-color: #ffe066; /* amarelo pastel */
+.header-principal .navbar-brand {
+    color: var(--cor-destaque-neon);
+    font-weight: 700;
+    font-size: 1.5rem;
 }
 
-/* --- GRÁFICO --- */
-canvas {
-    max-width: 100%;
-    height: auto;
+.header-principal .nav-link:hover,
+.header-principal .nav-link:focus,
+.header-principal .nav-link.active {
+    color: var(--cor-destaque-neon);
+    text-shadow: 0 0 8px var(--cor-brilho-painel);
 }
 
-/* --- BOTÕES DO GRÁFICO --- */
-.btn-group .btn {
-    border-radius: 0.25rem;
-    border-color: #457b9d;
-    color: #457b9d;
-    font-weight: 600;
-    transition: background-color 0.3s, color 0.3s;
+/* Ícone do menu hamburguer para o tema escuro */
+.header-principal .navbar-toggler {
+    border-color: var(--cor-borda-painel);
+}
+.header-principal .navbar-toggler-icon {
+    filter: invert(1) grayscale(100%) brightness(1.5) drop-shadow(0 0 3px var(--cor-destaque-neon));
 }
 
-.btn-group .btn:hover,
-.btn-group .btn:focus {
-    background-color: #457b9d;
-    color: #f1faee;
+/* --- INDICADORES DO HEADER --- */
+.live-button {
+    background: linear-gradient(45deg, #00875a, #33ff99);
+    color: #000;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 0 10px var(--cor-brilho-painel);
 }
 
-/* --- LEGENDAS --- */
-.trend-legend span {
-    margin-right: 1.2rem;
-    font-weight: 600;
-    color: #1d3557;
+#header-alert-status.alert-active {
+    background-color: var(--cor-alerta) !important;
+    color: white !important;
+    box-shadow: 0 0 10px rgba(255, 71, 87, 0.5);
 }
 
-/* --- HISTÓRICO E CONFIGURAÇÕES --- */
+/* --- ELEMENTOS DA PÁGINA --- */
+/* Remove o fundo branco dos itens de lista */
 .list-group-item {
     background-color: transparent;
-    color: #2d3436;
-    border: none;
-    padding-left: 0;
-    padding-right: 0;
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--cor-texto-secundario);
 }
 
-.badge {
-    font-size: 0.75rem;
-    padding: 0.4em 0.6em;
+/* Gráfico de Tendências */
+.trend-legend span {
+    color: var(--cor-texto-secundario);
+}
+
+#trendChart {
+    /* Ajusta as cores do gráfico via JavaScript (ver abaixo) */
+}
+
+/* Título de boas-vindas */
+.welcome-title {
+    color: var(--cor-destaque-neon);
     font-weight: 700;
-    border-radius: 0.5rem;
 }
 
-/* Badges coloridos */
-.badge.bg-warning {
-    background-color: #ffe066;
-    color: #1d3557;
+/*
+ * NOVAS CLASSES DE DESTAQUE PARA CARDS DINÂMICOS
+ * Adicione este bloco ao final do seu CSS.
+*/
+.card-highlight-ok {
+    /* Verde para status normal/baixo */
+    border-left: 5px solid var(--cor-destaque-neon);
 }
 
-.badge.bg-primary {
-    background-color: #457b9d;
-    color: #f1faee;
+.card-highlight-mid {
+    /* Amarelo/Âmbar para status moderado/aviso */
+    border-left: 5px solid #f1c40f;
 }
 
-.badge.bg-danger {
-    background-color: #ff6b6b;
-    color: white;
-}
-
-/*#rain-alert {*/
-/*    z-index: 1050; !* Para garantir que fique acima de outros elementos *!*/
-/*    width: auto;*/
-/*    left: 1rem;*/
-/*    right: 1rem;*/
-/*    top: 1rem;*/
-/*    position: fixed;*/
-/*}*/
-
-/* Barra de Alerta Persistente */
-.persistent-alert-bar {
-    background-color: rgb(255, 255, 255); /* Cor inicial neutra */
-    color: #495057;
-    text-align: center;
-    transition: background-color 0.7s ease-in-out, color 0.7s ease-in-out;
-    padding: 0 10px;
-    /* Se a navbar for fixed e você quiser que esta barra role com o conteúdo: */
-    position: sticky;
-    top: 60px; /* Altura da sua navbar */
-    z-index: 999;
-    font-family: "Syne", sans-serif;
-    /* Ou, se a navbar for static, ela simplesmente ficará abaixo no fluxo normal */
-}
-
-#alertIndicator {
-    background: #ff4427;
-}
-
-/* Style for Header Alert Indicator */
-#header-alert-status.alert-active {
-    background-color: #dc3545 !important; /* Bootstrap danger red */
-    color: white !important;
-}
-
-#header-alert-status.alert-inactive {
-    background-color: #1D3557; /* Original color for alert-indicator */
-    color: white;
-    font-weight: normal;
-}
-
-/* Ensure the .indicator class base styles are applied */
-.indicator {
-    padding: 3px 20px;
-    color: white;
-    /* Make sure existing styles from .alert-indicator are preserved or merged */
-}
-
-.alert-indicator {
-    margin: 0 15px;
-    /* background is handled by alert-active/alert-inactive */
-    /* color is handled by alert-active/alert-inactive */
-}
-
-
-
-.live-button {
-    margin-left: 10px;
-    background: #00076c;
-    color: white;
-    border: none;
-    position: relative; /* Importante para o pseudo-elemento de brilho */
-    /* Outros estilos base do botão */
-}
-
-.live-button::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 100%;
-    height: 100%;
-    transform: translate(-50%, -50%);
-    background-color: #007698;
-    border-radius: inherit; /* Herda o border-radius do botão */
-    animation: pulse-glow 2s infinite ease-out;
-    z-index: -1; /* Coloca o brilho atrás do texto do botão */
-    opacity: 0.7;
-}
-
-@keyframes pulse-glow {
-    0% {
-        transform: translate(-50%, -50%) scale(0.9);
-        opacity: 0.7;
-    }
-    70% {
-        transform: translate(-50%, -50%) scale(1.3); /* Aumenta o brilho */
-        opacity: 0; /* Torna o brilho mais transparente ao expandir */
-    }
-    100% {
-        transform: translate(-50%, -50%) scale(0.9);
-        opacity: 0;
-    }
-}
-
-
-/* In app/static/style.css */
-
-/* ... (your existing styles) ... */
-
-.alert-card-dynamic {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.alert-card-dynamic:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1) !important;
-}
-
-.alert-card-dynamic .card-header {
-    font-size: 1.05rem;
-}
-
-.alert-card-dynamic .badge {
-    font-size: 0.9em;
-}
-
-/* Example background colors based on border - can be more sophisticated */
-.alert-card-dynamic.border-danger {
-    background-color: #fff5f5; /* Very light red */
-}
-.alert-card-dynamic.border-danger .card-header {
-    color: #c0392b;
-}
-
-
-.alert-card-dynamic.border-warning {
-    background-color: #fff8e1; /* Very light orange */
-}
-.alert-card-dynamic.border-warning .card-header {
-    color: #f39c12;
-}
-
-.alert-card-dynamic.border-info {
-    background-color: #e3f2fd; /* Very light blue */
-}
-.alert-card-dynamic.border-info .card-header {
-    color: #2980b9;
+.card-highlight-crit {
+    /* Vermelho para status crítico */
+    border-left: 5px solid var(--cor-alerta);
 }

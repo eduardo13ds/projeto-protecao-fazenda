@@ -10,7 +10,7 @@
 <body>
 <div class="login-container">
     <div class="d-flex login-card flex-row">
-        <div class="login-logo-side text-center">
+        <div class="login-logo-side text-center glass-effect-final">
             <div class="d-flex align-items-center justify-content-center mb-3" style="gap: 1rem;">
                 <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="StormGuard logo">
                 <h2 class="mb-0">StormGuard</h2>
@@ -19,7 +19,7 @@
             <hr class="my-4" style="border-color:rgba(255,255,255,0.2);">
             <p class="small mb-0">© {{ 2025 }} StormGuard<br>Todos os direitos reservados.</p>
         </div>
-        <div class="login-form-side">
+        <div class="login-form-side glass-effect-final">
             <h1 class="text-center mb-4">Login</h1>
                                 {% with messages = get_flashed_messages(with_categories=true) %}
                         {% if messages %}

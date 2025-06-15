@@ -1,15 +1,10 @@
 """
 Routes for the main blueprint.
 """
-from flask_login import current_user, login_user, logout_user, login_required
-from app.forms import LoginForm # Importe o formulário
-from app.models import Usuario # Importe o modelo de usuário
-from app import db # Importe a instância do db
-from werkzeug.security import check_password_hash # Para checar a senha
 from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for
-from flask_login import current_user, login_user, logout_user, login_required
+from flask_login import login_required
 from app.mqtt.client import mqtt_client
-from app.forms import LoginForm # Importe o formulário
+
 # Create blueprint
 main = Blueprint('main', __name__)
 
@@ -53,10 +48,14 @@ def painel_alertas():
     """Render the alerts page."""
     return render_template('alertas.html')
 
+@main.route('/administrador')
+@login_required
+def administrador():
+    return render_template('area_administrador.html')
+
 @main.route('/latest-data', methods=['GET'])
 @main.route('/latest-data/<int:area_id>', methods=['GET'])
 @login_required
-
 def latest_data_endpoint(area_id=None):
     """Get the latest data from MQTT.
 
@@ -97,43 +96,8 @@ def latest_data_endpoint(area_id=None):
 
 @main.route('/latest-inmet', methods=['GET'])
 @login_required
-
 def latest_inmet_endpoint():
     """Retorna o último dado recebido do INMET via MQTT."""
     data = mqtt_client.get_latest_inmet_data()
     return jsonify(data)
-
-# Rota de Login
-@main.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-
-    form = LoginForm()
-    if form.validate_on_submit():
-        # **LÓGICA REAL AQUI**
-        # 1. Busque o usuário no banco de dados pelo nome de usuário do formulário
-        user = Usuario.query.filter_by(Nome_Usuario=form.username.data).first()
-
-        # 2. Verifique se o usuário existe e se a senha está correta
-        if user is None or not user.check_password(form.password.data):
-            flash('Nome de usuário ou senha inválidos', 'danger')
-            return redirect(url_for('main.login'))
-
-        # 3. Se tudo estiver correto, faça o login do usuário
-        login_user(user, remember=form.remember_me.data)
-        flash('Login realizado com sucesso!', 'success')
-
-        # Redireciona para a página que o usuário tentou acessar ou para o index
-        next_page = request.args.get('next')
-        return redirect(next_page) if next_page else redirect(url_for('main.index'))
-
-    return render_template('login.html', title='Login', form=form)
-
-# Rota de Logout
-@main.route('/logout')
-def logout():
-    logout_user()
-    return redirect(url_for('main.index'))
-
 # Adicione outras rotas aqui (registro, etc.)

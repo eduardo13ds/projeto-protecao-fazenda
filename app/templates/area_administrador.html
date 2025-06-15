@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% block title %}Área do Administrador{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
+
+<style>
+    /*
+     * ESTILOS PARA O PAINEL DE ADMINISTRAÇÃO "COLHEITA DIGITAL"
+     */
+
+    .admin-container {
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+
+
+    /* --- SIDEBAR DE NAVEGAÇÃO --- */
+    .admin-sidebar {
+        flex: 0 0 260px; /* Largura fixa para a sidebar */
+        background-color: var(--cor-fundo-painel);
+        border: 1px solid var(--cor-borda-painel);
+        border-radius: 12px;
+        padding: 1rem;
+        backdrop-filter: blur(5px);
+    }
+
+    .admin-sidebar-title {
+        color: var(--cor-destaque-neon);
+        font-weight: 700;
+        font-size: 1.2rem;
+        padding-bottom: 0.75rem;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--cor-borda-painel);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .admin-sidebar .nav-pills .nav-link {
+        color: var(--cor-texto-secundario);
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+        transition: all 0.2s ease;
+        border-radius: 8px;
+    }
+
+    .admin-sidebar .nav-pills .nav-link .table-icon {
+        width: 20px; /* Alinha os ícones */
+    }
+
+    .admin-sidebar .nav-pills .nav-link:hover {
+        background-color: var(--cor-brilho-painel);
+        color: var(--cor-texto-principal);
+    }
+
+    .admin-sidebar .nav-pills .nav-link.active {
+        background-color: var(--cor-destaque-neon);
+        color: #000;
+        font-weight: 700;
+        box-shadow: 0 0 15px var(--cor-brilho-painel);
+    }
+
+    .admin-sidebar .nav-link .readonly-icon {
+        margin-left: auto;
+        font-size: 0.8rem;
+        opacity: 0.7;
+    }
+
+
+    /* --- ÁREA DE CONTEÚDO PRINCIPAL --- */
+    .admin-main-content {
+        flex-grow: 1;
+        background-color: var(--cor-fundo-painel);
+        border: 1px solid var(--cor-borda-painel);
+        border-radius: 12px;
+        padding: 1.5rem;
+        backdrop-filter: blur(5px);
+    }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--cor-borda-painel);
+        padding-bottom: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .content-header .table-title {
+        color: var(--cor-texto-principal);
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    .content-header .table-title span {
+        color: var(--cor-destaque-neon);
+    }
+
+
+    /* Estilo para os botões e dropdown de exportação */
+    .btn-admin {
+        background-color: var(--cor-destaque-neon);
+        color: #000;
+        font-weight: 700;
+        border: none;
+        border-radius: 8px;
+        padding: 0.6rem 1.2rem;
+        transition: all 0.2s ease;
+    }
+    .btn-admin:hover {
+        filter: brightness(1.2);
+        box-shadow: 0 0 15px var(--cor-brilho-painel);
+    }
+    .dropdown .dropdown-menu {
+        background-color: var(--cor-fundo-painel);
+        border: 1px solid var(--cor-borda-painel);
+        border-radius: 8px;
+    }
+    .dropdown .dropdown-item {
+        color: var(--cor-texto-secundario);
+    }
+    .dropdown .dropdown-item:hover {
+        background-color: var(--cor-brilho-painel);
+        color: var(--cor-texto-principal);
+    }
+
+
+    /* --- TABELA DE DADOS --- */
+    .table-responsive-wrapper {
+        overflow-x: auto;
+    }
+
+    .table-dark-theme {
+        width: 100%;
+        border-collapse: collapse;
+        color: var(--cor-texto-principal);
+    }
+
+    .table-dark-theme thead th {
+        color: var(--cor-destaque-neon);
+        text-align: left;
+        padding: 1rem;
+        border-bottom: 2px solid var(--cor-destaque-neon);
+        white-space: nowrap;
+    }
+
+    .table-dark-theme tbody td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--cor-borda-painel);
+        vertical-align: middle;
+    }
+
+    .table-dark-theme tbody tr:hover {
+        background-color: var(--cor-brilho-painel);
+    }
+
+    .table-dark-theme .actions-cell {
+        text-align: right;
+        white-space: nowrap;
+    }
+
+    .btn-action {
+        background: transparent;
+        border: none;
+        color: var(--cor-texto-secundario);
+        font-size: 1.1rem;
+        margin-left: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        transition: all 0.2s ease;
+    }
+    .btn-action.edit:hover {
+        color: #f1c40f; /* Amarelo para editar */
+    }
+    .btn-action.delete:hover {
+        color: var(--cor-alerta); /* Vermelho para deletar */
+    }
+
+
+    /* MODAL */
+    .modal-content {
+        background-color: var(--cor-fundo-painel);
+        border: 1px solid var(--cor-alerta);
+        color: var(--cor-texto-principal);
+    }
+    .modal-header, .modal-footer {
+        border-color: var(--cor-borda-painel);
+    }
+    .modal-header .btn-close {
+        filter: invert(1) grayscale(100%) brightness(2);
+    }
+
+</style>
+
+<div class="admin-container">
+    <aside class="admin-sidebar">
+        <h2 class="admin-sidebar-title">
+            <i class="fas fa-database"></i>
+            <span>Tabelas</span>
+        </h2>
+        <ul class="nav nav-pills flex-column">
+            <li class="nav-item">
+                <a href="#" class="nav-link active">
+                    <i class="fas fa-users table-icon"></i>
+                    Usuarios
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-tractor table-icon"></i>
+                    Fazendas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-microchip table-icon"></i>
+                    Sensores
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-robot table-icon"></i>
+                    Atuadores
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-key table-icon"></i>
+                    Níveis de Acesso
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-tags table-icon"></i>
+                    Tipos (Sensor/Atuador)
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-link table-icon"></i>
+                    Acessos (Usuario/Fazenda)
+                </a>
+            </li>
+            <hr style=" color: var(--cor-borda-painel);">
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-eye table-icon"></i>
+                    Alertas
+                    <i class="fas fa-lock readonly-icon" title="Apenas Leitura"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-eye table-icon"></i>
+                    Registros de Leituras
+                    <i class="fas fa-lock readonly-icon" title="Apenas Leitura"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-eye table-icon"></i>
+                    Registros de Comandos
+                    <i class="fas fa-lock readonly-icon" title="Apenas Leitura"></i>
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <main class="admin-main-content">
+        <div class="content-header">
+            <h1 class="table-title">Gerenciando: <span>Usuarios</span></h1>
+            <div class="d-flex gap-2">
+                <button class="btn-admin"><i class="fas fa-plus me-2"></i>Adicionar Novo</button>
+
+                <div class="dropdown">
+                    <button class="btn-admin dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-file-export me-2"></i>Exportar
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>Exportar para PDF</a></li>
+                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-excel me-2"></i>Exportar para Excel</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-responsive-wrapper">
+            <table class="table-dark-theme">
+                <thead>
+                    <tr>
+                        <th>ID_Usuario</th>
+                        <th>Nome_Usuario</th>
+                        <th>Nome_Completo</th>
+                        <th>Email</th>
+                        <th>Status_Conta</th>
+                        <th class="actions-cell">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>joao.silva</td>
+                        <td>João Silva</td>
+                        <td>joao.silva@email.com</td>
+                        <td>Ativa</td>
+                        <td class="actions-cell">
+                            <button class="btn-action edit" title="Editar"><i class="fas fa-pencil"></i></button>
+                            <button class="btn-action delete" title="Deletar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="1"><i class="fas fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>maria.oliveira</td>
+                        <td>Maria Oliveira</td>
+                        <td>maria.oliveira@email.com</td>
+                        <td>Ativa</td>
+                        <td class="actions-cell">
+                            <button class="btn-action edit" title="Editar"><i class="fas fa-pencil"></i></button>
+                            <button class="btn-action delete" title="Deletar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="2"><i class="fas fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>carlos.p</td>
+                        <td>Carlos Pereira</td>
+                        <td>carlos.pereira@email.com</td>
+                        <td>Ativa</td>
+                        <td class="actions-cell">
+                            <button class="btn-action edit" title="Editar"><i class="fas fa-pencil"></i></button>
+                            <button class="btn-action delete" title="Deletar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="3"><i class="fas fa-trash-can"></i></button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+
+
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="confirmDeleteModalLabel"><i class="fas fa-triangle-exclamation me-2" style=" color: var(--cor-alerta);"></i>Confirmar Exclusão</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Você tem certeza que deseja deletar este registro? Esta ação não pode ser desfeita.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Sim, Deletar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    // Ativa os tooltips do Bootstrap para os botões de ação
+    const tooltipTriggerList = document.querySelectorAll('[title]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
+    // Lógica para o Modal de Confirmação de Exclusão
+    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
+    if (confirmDeleteModal) {
+        confirmDeleteModal.addEventListener('show.bs.modal', event => {
+
+            // Botão que acionou o modal
+            const button = event.relatedTarget;
+            // Extrai o ID do atributo data-id
+            const recordId = button.getAttribute('data-id');
+
+            // Você pode usar 'recordId' para fazer a chamada de exclusão no backend
+            const confirmButton = confirmDeleteModal.querySelector('#confirmDeleteButton');
+            confirmButton.onclick = function () {
+                console.log(`Deletar registro com ID: ${recordId}`);
+                // Aqui você faria a chamada fetch/axios para a sua rota de delete no Flask
+                // Ex: fetch(`/admin/usuarios/delete/${recordId}`, { method: 'POST' })
+                // E então fecharia o modal após a confirmação
+                bootstrap.Modal.getInstance(confirmDeleteModal).hide();
+            };
+        });
+    }
+</script>
+
+{% endblock %}
