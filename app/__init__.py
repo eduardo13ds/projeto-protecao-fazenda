@@ -65,12 +65,12 @@ def create_app(config_name='default'):
     from .blueprints.main import main as main_blueprint
     from .blueprints.errors import errors as errors_blueprint
     from .blueprints.login import login_register as login_blueprint
-    from .blueprints.db_interaction import fazendas_bp as fazendas_blueprint
+    from .blueprints.db_interaction import admin_bp as admin_blueprint
 
     app.register_blueprint(main_blueprint)
     app.register_blueprint(errors_blueprint)
     app.register_blueprint(login_blueprint)
-    app.register_blueprint(fazendas_blueprint)
+    app.register_blueprint(admin_blueprint)
 
     return app
 

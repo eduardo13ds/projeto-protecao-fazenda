@@ -4,6 +4,19 @@ Routes for the main blueprint.
 from flask import Blueprint, render_template, jsonify, request, flash, redirect, url_for
 from flask_login import login_required
 from app.mqtt.client import mqtt_client
+from app.models.alerta import Alerta
+from app.models.atuador import Atuador
+from app.models.fazenda import Fazenda
+from app.models.nivel_acesso import NivelAcesso
+from app.models.registro_comando_atuador import RegistroComandoAtuador
+from app.models.registro_leitura import RegistroLeitura
+from app.models.sensor import Sensor
+from app.models.tipo_atuador import TipoAtuador
+from app.models.tipo_sensor import TipoSensor
+from app.models.usuario import Usuario
+from app.models.tabelas_associacao import usuario_fazenda_acesso
+
+
 
 # Create blueprint
 main = Blueprint('main', __name__)
@@ -47,11 +60,6 @@ def index(area_id=None):
 def painel_alertas():
     """Render the alerts page."""
     return render_template('alertas.html')
-
-@main.route('/administrador')
-@login_required
-def administrador():
-    return render_template('area_administrador.html')
 
 @main.route('/latest-data', methods=['GET'])
 @main.route('/latest-data/<int:area_id>', methods=['GET'])

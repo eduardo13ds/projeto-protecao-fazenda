@@ -6,386 +6,381 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
 <style>
+    /* Estilos base (iguais aos anteriores) */
+    .admin-container { display: flex; gap: 1.5rem; align-items: flex-start; }
+    .admin-sidebar { flex: 0 0 260px; background-color: var(--cor-fundo-painel); border: 1px solid var(--cor-borda-painel); border-radius: 12px; padding: 1rem; backdrop-filter: blur(5px); }
+    .admin-sidebar-title { color: var(--cor-destaque-neon); font-weight: 700; font-size: 1.2rem; padding-bottom: 0.75rem; margin-bottom: 1rem; border-bottom: 1px solid var(--cor-borda-painel); display: flex; align-items: center; gap: 0.75rem; }
+    .admin-sidebar .nav-pills .nav-link { color: var(--cor-texto-secundario); font-weight: 500; display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem; transition: all 0.2s ease; border-radius: 8px; }
+    .admin-sidebar .nav-pills .nav-link .table-icon { width: 20px; }
+    .admin-sidebar .nav-pills .nav-link:hover { background-color: var(--cor-brilho-painel); color: var(--cor-texto-principal); }
+    .admin-sidebar .nav-pills .nav-link.active { background-color: var(--cor-destaque-neon); color: #000; font-weight: 700; box-shadow: 0 0 15px var(--cor-brilho-painel); }
+    .admin-sidebar .nav-link .readonly-icon { margin-left: auto; font-size: 0.8rem; opacity: 0.7; }
+    .admin-main-content { flex-grow: 1; display: flex; flex-direction: column; background-color: var(--cor-fundo-painel); border: 1px solid var(--cor-borda-painel); border-radius: 12px; padding: 1.5rem; backdrop-filter: blur(5px); min-width: 0}
+    .content-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    .content-header .table-title { color: var(--cor-texto-principal); font-size: 1.8rem; font-weight: 700; }
+    .content-header .table-title span { color: var(--cor-destaque-neon); }
+    .btn-admin { background-color: var(--cor-destaque-neon); color: #000; font-weight: 700; border: none; border-radius: 8px; padding: 0.6rem 1.2rem; transition: all 0.2s ease; }
+    .btn-admin:hover { filter: brightness(1.2); box-shadow: 0 0 15px var(--cor-brilho-painel); }
+    .dropdown .dropdown-menu { background-color: var(--cor-fundo-painel); border: 1px solid var(--cor-borda-painel); border-radius: 8px; }
+    .dropdown .dropdown-item { color: var(--cor-texto-secundario); }
+    .dropdown .dropdown-item:hover { background-color: var(--cor-brilho-painel); color: var(--cor-texto-principal); }
+
     /*
-     * ESTILOS PARA O PAINEL DE ADMINISTRAÇÃO "COLHEITA DIGITAL"
+     * =================================================================
+     * ============= NOVOS ESTILOS E MELHORIAS =========================
+     * =================================================================
      */
 
-    .admin-container {
-        display: flex;
-        gap: 1.5rem;
-        align-items: flex-start;
-    }
-
-
-    /* --- SIDEBAR DE NAVEGAÇÃO --- */
-    .admin-sidebar {
-        flex: 0 0 260px; /* Largura fixa para a sidebar */
-        background-color: var(--cor-fundo-painel);
-        border: 1px solid var(--cor-borda-painel);
-        border-radius: 12px;
-        padding: 1rem;
-        backdrop-filter: blur(5px);
-    }
-
-    .admin-sidebar-title {
-        color: var(--cor-destaque-neon);
-        font-weight: 700;
-        font-size: 1.2rem;
-        padding-bottom: 0.75rem;
-        margin-bottom: 1rem;
-        border-bottom: 1px solid var(--cor-borda-painel);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-    }
-
-    .admin-sidebar .nav-pills .nav-link {
-        color: var(--cor-texto-secundario);
-        font-weight: 500;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        margin-bottom: 0.5rem;
-        transition: all 0.2s ease;
-        border-radius: 8px;
-    }
-
-    .admin-sidebar .nav-pills .nav-link .table-icon {
-        width: 20px; /* Alinha os ícones */
-    }
-
-    .admin-sidebar .nav-pills .nav-link:hover {
-        background-color: var(--cor-brilho-painel);
-        color: var(--cor-texto-principal);
-    }
-
-    .admin-sidebar .nav-pills .nav-link.active {
-        background-color: var(--cor-destaque-neon);
-        color: #000;
-        font-weight: 700;
-        box-shadow: 0 0 15px var(--cor-brilho-painel);
-    }
-
-    .admin-sidebar .nav-link .readonly-icon {
-        margin-left: auto;
-        font-size: 0.8rem;
-        opacity: 0.7;
-    }
-
-
-    /* --- ÁREA DE CONTEÚDO PRINCIPAL --- */
-    .admin-main-content {
-        flex-grow: 1;
-        background-color: var(--cor-fundo-painel);
-        border: 1px solid var(--cor-borda-painel);
-        border-radius: 12px;
-        padding: 1.5rem;
-        backdrop-filter: blur(5px);
-    }
-
-    .content-header {
+    /* --- BARRA DE FERRAMENTAS (PESQUISA E FILTROS) --- */
+    .admin-toolbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid var(--cor-borda-painel);
-        padding-bottom: 1rem;
         margin-bottom: 1.5rem;
+        gap: 1rem;
     }
 
-    .content-header .table-title {
-        color: var(--cor-texto-principal);
-        font-size: 1.8rem;
-        font-weight: 700;
-    }
-    .content-header .table-title span {
-        color: var(--cor-destaque-neon);
+    .search-wrapper {
+        position: relative;
+        flex-grow: 1;
     }
 
-
-    /* Estilo para os botões e dropdown de exportação */
-    .btn-admin {
-        background-color: var(--cor-destaque-neon);
-        color: #000;
-        font-weight: 700;
-        border: none;
-        border-radius: 8px;
-        padding: 0.6rem 1.2rem;
-        transition: all 0.2s ease;
-    }
-    .btn-admin:hover {
-        filter: brightness(1.2);
-        box-shadow: 0 0 15px var(--cor-brilho-painel);
-    }
-    .dropdown .dropdown-menu {
-        background-color: var(--cor-fundo-painel);
+    #table-search-input {
+        width: 100%;
+        background-color: rgba(0,0,0,0.2);
         border: 1px solid var(--cor-borda-painel);
+        color: var(--cor-texto-principal);
         border-radius: 8px;
+        padding: 0.6rem 1rem 0.6rem 2.5rem; /* Espaço para o ícone */
+        transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .dropdown .dropdown-item {
+    #table-search-input:focus {
+        outline: none;
+        border-color: var(--cor-destaque-neon);
+        box-shadow: 0 0 10px var(--cor-brilho-painel);
+    }
+    .search-wrapper .fa-magnifying-glass {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
         color: var(--cor-texto-secundario);
     }
-    .dropdown .dropdown-item:hover {
-        background-color: var(--cor-brilho-painel);
-        color: var(--cor-texto-principal);
-    }
 
-
-    /* --- TABELA DE DADOS --- */
+    /* --- MELHORIAS NA TABELA (MAIS DENSA) --- */
     .table-responsive-wrapper {
         overflow-x: auto;
+        flex-grow: 1; /* Faz a tabela ocupar o espaço disponível */
     }
 
     .table-dark-theme {
         width: 100%;
         border-collapse: collapse;
         color: var(--cor-texto-principal);
+        font-size: 0.85rem; /* <<< FONTE MENOR PARA MAIS DENSIDADE */
     }
 
     .table-dark-theme thead th {
         color: var(--cor-destaque-neon);
         text-align: left;
-        padding: 1rem;
+        padding: 0.75rem; /* <<< MENOS PADDING */
         border-bottom: 2px solid var(--cor-destaque-neon);
         white-space: nowrap;
     }
 
     .table-dark-theme tbody td {
-        padding: 1rem;
+        padding: 0.75rem; /* <<< MENOS PADDING */
         border-bottom: 1px solid var(--cor-borda-painel);
         vertical-align: middle;
+        /* Limita o tamanho de colunas com texto longo */
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-
+    /* Mostra o texto completo ao passar o mouse */
+    .table-dark-theme tbody td:hover {
+        white-space: normal;
+        overflow: visible;
+        word-wrap: break-word;
+    }
+    
     .table-dark-theme tbody tr:hover {
         background-color: var(--cor-brilho-painel);
     }
+    .table-dark-theme .actions-cell { text-align: right; white-space: nowrap; max-width: 120px; }
+    .btn-action { background: transparent; border: none; color: var(--cor-texto-secundario); font-size: 1rem; margin-left: 0.5rem; padding: 0.25rem 0.5rem; transition: all 0.2s ease; }
+    .btn-action.edit:hover { color: #f1c40f; }
+    .btn-action.delete:hover { color: var(--cor-alerta); }
 
-    .table-dark-theme .actions-cell {
-        text-align: right;
-        white-space: nowrap;
-    }
+/*
+ * =================================================================
+ * ============= ESTILO PARA O MODAL DE CONFIRMAÇÃO ================
+ * =================================================================
+*/
 
-    .btn-action {
-        background: transparent;
-        border: none;
+/* O container principal do modal */
+.modal-content {
+    background-color: var(--cor-fundo-painel); /* Usa nosso fundo escuro e translúcido */
+    color: var(--cor-texto-principal);        /* Garante que o texto seja legível */
+    border-radius: 12px;
+    border: 1px solid var(--cor-alerta);      /* Uma borda vermelha para indicar uma ação de perigo */
+    backdrop-filter: blur(5px);
+}
+
+/* Estiliza as linhas divisórias do cabeçalho e rodapé */
+.modal-header,
+.modal-footer {
+    border-color: var(--cor-borda-painel);
+}
+
+/* Inverte a cor do botão 'X' padrão do Bootstrap para branco, tornando-o visível */
+.modal-header .btn-close {
+    filter: invert(1) grayscale(100%) brightness(2);
+}
+
+/* Opcional: Estilo para o botão de confirmação, embora a classe .btn-danger já seja forte */
+#confirmDeleteButton {
+    /* Você pode adicionar um brilho ou outra customização aqui se desejar */
+    box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+}
+
+    /* --- PAGINAÇÃO --- */
+    .pagination-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
         color: var(--cor-texto-secundario);
-        font-size: 1.1rem;
-        margin-left: 0.75rem;
-        padding: 0.25rem 0.5rem;
-        transition: all 0.2s ease;
+        font-size: 0.9rem;
     }
-    .btn-action.edit:hover {
-        color: #f1c40f; /* Amarelo para editar */
+    .pagination {
+        margin: 0;
     }
-    .btn-action.delete:hover {
-        color: var(--cor-alerta); /* Vermelho para deletar */
+    .pagination .page-item .page-link {
+        background-color: transparent;
+        border: 1px solid var(--cor-borda-painel);
+        color: var(--cor-texto-secundario);
+        margin: 0 2px;
+        border-radius: 6px;
     }
-
-
-    /* MODAL */
-    .modal-content {
-        background-color: var(--cor-fundo-painel);
-        border: 1px solid var(--cor-alerta);
+    .pagination .page-item .page-link:hover {
+        background-color: var(--cor-brilho-painel);
         color: var(--cor-texto-principal);
+        border-color: var(--cor-destaque-neon);
     }
-    .modal-header, .modal-footer {
-        border-color: var(--cor-borda-painel);
+    .pagination .page-item.active .page-link {
+        background-color: var(--cor-destaque-neon);
+        border-color: var(--cor-destaque-neon);
+        color: #000;
+        font-weight: 700;
     }
-    .modal-header .btn-close {
-        filter: invert(1) grayscale(100%) brightness(2);
+    .pagination .page-item.disabled .page-link {
+        color: #6c757d;
+        border-color: #444;
     }
 
+    /*
+ * =================================================================
+ * ============= ESTILIZAÇÃO DA BARRA DE ROLAGEM ===================
+ * =================================================================
+*/
+.table-responsive-wrapper::-webkit-scrollbar {
+  height: 8px; /* Altura da barra de rolagem horizontal */
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+  border-radius: 4px;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb {
+  background-color: var(--cor-borda-painel);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.table-responsive-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: var(--cor-destaque-neon);
+}
 </style>
 
 <div class="admin-container">
     <aside class="admin-sidebar">
-        <h2 class="admin-sidebar-title">
-            <i class="fas fa-database"></i>
-            <span>Tabelas</span>
-        </h2>
+        <h2 class="admin-sidebar-title"><i class="fas fa-database"></i><span>Tabelas</span></h2>
         <ul class="nav nav-pills flex-column">
-            <li class="nav-item">
-                <a href="#" class="nav-link active">
-                    <i class="fas fa-users table-icon"></i>
-                    Usuarios
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-tractor table-icon"></i>
-                    Fazendas
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-microchip table-icon"></i>
-                    Sensores
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-robot table-icon"></i>
-                    Atuadores
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-key table-icon"></i>
-                    Níveis de Acesso
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-tags table-icon"></i>
-                    Tipos (Sensor/Atuador)
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-link table-icon"></i>
-                    Acessos (Usuario/Fazenda)
-                </a>
-            </li>
-            <hr style=" color: var(--cor-borda-painel);">
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-eye table-icon"></i>
-                    Alertas
-                    <i class="fas fa-lock readonly-icon" title="Apenas Leitura"></i>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-eye table-icon"></i>
-                    Registros de Leituras
-                    <i class="fas fa-lock readonly-icon" title="Apenas Leitura"></i>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-eye table-icon"></i>
-                    Registros de Comandos
-                    <i class="fas fa-lock readonly-icon" title="Apenas Leitura"></i>
-                </a>
-            </li>
+            {% for name, config in sidebar_items.items() %}<li class="nav-item"><a href="{{ url_for('admin.manage_table', table_name=name) }}" class="nav-link {% if name == current_table_name %}active{% endif %}"><i class="{{ config.icon }} table-icon"></i>{{ config.display }}{% if config.get('readonly') %}<i class="fas fa-lock readonly-icon" title="Apenas Leitura"></i>{% endif %}</a></li>{% endfor %}
         </ul>
     </aside>
 
     <main class="admin-main-content">
         <div class="content-header">
-            <h1 class="table-title">Gerenciando: <span>Usuarios</span></h1>
+            <h1 class="table-title">Gerenciando: <span>{{ display_name }}</span></h1>
             <div class="d-flex gap-2">
-                <button class="btn-admin"><i class="fas fa-plus me-2"></i>Adicionar Novo</button>
-
-                <div class="dropdown">
-                    <button class="btn-admin dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-file-export me-2"></i>Exportar
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-pdf me-2"></i>Exportar para PDF</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="fas fa-file-excel me-2"></i>Exportar para Excel</a></li>
-                    </ul>
-                </div>
+                {% if not is_readonly %}<button class="btn-admin"><i class="fas fa-plus me-2"></i>Adicionar</button>{% endif %}
+                <div class="dropdown"><button class="btn-admin dropdown-toggle" type="button" data-bs-toggle="dropdown"><i class="fas fa-file-export me-2"></i>Exportar</button>                    <ul class="dropdown-menu">
+                        {# --- LINKS ATUALIZADOS --- #}
+                        {# O link agora aponta para a nova rota de exportação, passando a tabela atual #}
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('admin.export_pdf', table_name=current_table_name) }}">
+                                <i class="fas fa-file-pdf me-2"></i>Exportar para PDF
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="{{ url_for('admin.export_excel', table_name=current_table_name) }}">
+                                <i class="fas fa-file-excel me-2"></i>Exportar para Excel
+                            </a>
+                        </li>
+                    </ul></div>
             </div>
         </div>
 
+        <div class="admin-toolbar">
+            <div class="search-wrapper">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="search" id="table-search-input" class="form-control" placeholder="Pesquisar em {{ display_name }}...">
+            </div>
+            </div>
+
         <div class="table-responsive-wrapper">
-            <table class="table-dark-theme">
+            <table class="table-dark-theme" id="data-table">
                 <thead>
                     <tr>
-                        <th>ID_Usuario</th>
-                        <th>Nome_Usuario</th>
-                        <th>Nome_Completo</th>
-                        <th>Email</th>
-                        <th>Status_Conta</th>
-                        <th class="actions-cell">Ações</th>
+                        {% for header in headers %}<th>{{ header }}</th>{% endfor %}
+                        {% if not is_readonly %}<th class="actions-cell">Ações</th>{% endif %}
                     </tr>
                 </thead>
                 <tbody>
+                    {% for item in items %}
                     <tr>
-                        <td>1</td>
-                        <td>joao.silva</td>
-                        <td>João Silva</td>
-                        <td>joao.silva@email.com</td>
-                        <td>Ativa</td>
+                        {% for header in headers %}<td>{{ item[header] }}</td>{% endfor %}
+                        {% if not is_readonly %}
                         <td class="actions-cell">
+                            {% set record_id = item[headers[0]] %}
                             <button class="btn-action edit" title="Editar"><i class="fas fa-pencil"></i></button>
-                            <button class="btn-action delete" title="Deletar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="1"><i class="fas fa-trash-can"></i></button>
+                            <button class="btn-action delete" title="Deletar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="{{ record_id }}"><i class="fas fa-trash-can"></i></button>
                         </td>
+                        {% endif %}
                     </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>maria.oliveira</td>
-                        <td>Maria Oliveira</td>
-                        <td>maria.oliveira@email.com</td>
-                        <td>Ativa</td>
-                        <td class="actions-cell">
-                            <button class="btn-action edit" title="Editar"><i class="fas fa-pencil"></i></button>
-                            <button class="btn-action delete" title="Deletar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="2"><i class="fas fa-trash-can"></i></button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>carlos.p</td>
-                        <td>Carlos Pereira</td>
-                        <td>carlos.pereira@email.com</td>
-                        <td>Ativa</td>
-                        <td class="actions-cell">
-                            <button class="btn-action edit" title="Editar"><i class="fas fa-pencil"></i></button>
-                            <button class="btn-action delete" title="Deletar" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal" data-id="3"><i class="fas fa-trash-can"></i></button>
-                        </td>
-                    </tr>
+                    {% else %}
+                    <tr><td colspan="{{ headers|length + 1 }}" class="text-center">Nenhum registro encontrado.</td></tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
+
+        <div class="pagination-footer">
+            <div class="entries-info">
+                Mostrando 1 a {{ items|length }} de {{ items|length }} registros
+            </div>
+            <nav aria-label="Navegação da Tabela">
+              <ul class="pagination">
+                <li class="page-item disabled"><a class="page-link" href="#">Anterior</a></li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item"><a class="page-link" href="#">Próximo</a></li>
+              </ul>
+            </nav>
+        </div>
+
     </main>
 </div>
-
-
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h1 class="modal-title fs-5" id="confirmDeleteModalLabel"><i class="fas fa-triangle-exclamation me-2" style=" color: var(--cor-alerta);"></i>Confirmar Exclusão</h1>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Você tem certeza que deseja deletar este registro? Esta ação não pode ser desfeita.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Sim, Deletar</button>
-            </div>
-        </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="confirmDeleteModalLabel"><i class="fas fa-triangle-exclamation me-2" style="color: var(--cor-alerta);"></i>Confirmar Exclusão</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Você tem certeza que deseja deletar este registro? Esta ação não pode ser desfeita.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="confirmDeleteButton">Sim, Deletar</button>
+      </div>
     </div>
+  </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('table-search-input');
+  const tbody = document.querySelector('#data-table tbody');
+  // pega o <tr> de "Nenhum registro encontrado"
+  const emptyRow = tbody.querySelector('tr td.text-center')?.closest('tr');
 
+  function filterTable() {
+    const query = searchInput.value.trim().toLowerCase();
+    let anyVisible = false;
+
+    // percorre cada linha, pulando a linha de "nenhum registro"
+    Array.from(tbody.querySelectorAll('tr')).forEach(row => {
+      if (row === emptyRow) return;
+
+      // concatena todo texto das células de dados
+      const cells = Array.from(row.children)
+                         .filter(td => !td.classList.contains('actions-cell'));
+      const rowText = cells.map(td => td.textContent.toLowerCase()).join(' ');
+
+      // se não há busca OU o texto da linha inclui o termo, mostramos; senão, escondemos
+      if (!query || rowText.includes(query)) {
+        row.style.display = '';
+        anyVisible = true;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    // se há busca e nenhuma linha visível, mostra o placeholder; caso contrário, esconde-o
+    if (emptyRow) {
+      emptyRow.style.display = (!anyVisible && query) ? '' : 'none';
+    }
+  }
+
+  searchInput.addEventListener('input', filterTable);
+});
+</script>
 
 <script>
-    // Ativa os tooltips do Bootstrap para os botões de ação
-    const tooltipTriggerList = document.querySelectorAll('[title]');
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    // O ideal é que este código esteja dentro de um event listener 'DOMContentLoaded'
+document.addEventListener('DOMContentLoaded', function() {
 
-    // Lógica para o Modal de Confirmação de Exclusão
-    const confirmDeleteModal = document.getElementById('confirmDeleteModal');
-    if (confirmDeleteModal) {
-        confirmDeleteModal.addEventListener('show.bs.modal', event => {
-
-            // Botão que acionou o modal
-            const button = event.relatedTarget;
-            // Extrai o ID do atributo data-id
-            const recordId = button.getAttribute('data-id');
-
-            // Você pode usar 'recordId' para fazer a chamada de exclusão no backend
-            const confirmButton = confirmDeleteModal.querySelector('#confirmDeleteButton');
-            confirmButton.onclick = function () {
-                console.log(`Deletar registro com ID: ${recordId}`);
-                // Aqui você faria a chamada fetch/axios para a sua rota de delete no Flask
-                // Ex: fetch(`/admin/usuarios/delete/${recordId}`, { method: 'POST' })
-                // E então fecharia o modal após a confirmação
-                bootstrap.Modal.getInstance(confirmDeleteModal).hide();
-            };
-        });
-    }
+  // Lógica para o Modal de Confirmação de Exclusão
+  const confirmDeleteModal = document.getElementById("confirmDeleteModal");
+  if (confirmDeleteModal) {
+    
+    // Este evento é acionado toda vez que o modal está prestes a ser exibido
+    confirmDeleteModal.addEventListener("show.bs.modal", (event) => {
+      
+      // Identifica o botão exato que o usuário clicou (a lixeira de uma linha específica)
+      const button = event.relatedTarget;
+      
+      if (button) {
+        // Extrai o ID do registro do atributo 'data-id' daquele botão
+        const recordId = button.getAttribute("data-id");
+        
+        // Encontra o botão vermelho "Sim, Deletar" dentro do modal
+        const confirmButton = confirmDeleteModal.querySelector("#confirmDeleteButton");
+        
+        if (confirmButton) {
+          // Atribui a ação de exclusão a este botão
+          confirmButton.onclick = function () {
+            console.log(`Deletar registro com ID: ${recordId}`);
+            
+            // É aqui que a sua lógica de backend (fetch para o Flask) seria chamada
+            // para deletar o registro com o 'recordId'.
+            
+            // Esconde o modal após a ação ser iniciada.
+            bootstrap.Modal.getInstance(confirmDeleteModal).hide();
+          };
+        }
+      }
+    });
+  }
+  
+});
 </script>
 
 {% endblock %}

@@ -1,3 +1,3 @@
-from .fazenda import fazendas_bp
+from .admin_bp import admin_bp
 
-__all__ = ['fazendas_bp']
+__all__ = ['admin_bp']

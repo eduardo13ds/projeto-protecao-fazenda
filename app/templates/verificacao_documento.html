@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}Verificação de Documento{% endblock %}
+
+{% block content %}
+<style>
+    .verification-container {
+        min-height: 70vh; /* Ocupa boa parte da tela */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+    }
+
+    .verification-card {
+        max-width: 700px;
+        width: 100%;
+        background-color: var(--cor-fundo-painel);
+        border: 1px solid var(--cor-borda-painel);
+        border-radius: 12px;
+        padding: 2.5rem;
+        backdrop-filter: blur(5px);
+        text-align: center;
+    }
+
+    .status-icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    .status-icon.success {
+        color: var(--cor-destaque-neon);
+        text-shadow: 0 0 20px var(--cor-brilho-painel);
+    }
+
+    .status-icon.failure {
+        color: var(--cor-alerta);
+        text-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+    }
+
+    .verification-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--cor-texto-principal);
+        margin-bottom: 1.5rem;
+    }
+
+    .verification-details {
+        text-align: left;
+        color: var(--cor-texto-secundario);
+        border-top: 1px solid var(--cor-borda-painel);
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+    }
+
+    .verification-details p {
+        background-color: rgba(0,0,0,0.2);
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+    }
+
+    .verification-details strong {
+        color: var(--cor-texto-principal);
+        font-weight: 500;
+    }
+</style>
+
+<div class="verification-container">
+    <div class="verification-card">
+        <i class="fas fa-check-circle status-icon success"></i>
+        <h1 class="verification-title">Documento Autêntico</h1>
+        <p class="text-white-50">Este documento foi verificado em nossos sistemas e sua autenticidade foi confirmada.</p>
+        
+        <div class="verification-details">
+            <p><span>ID do Documento:</span> <strong>{{ doc.id or 'N/A' }}</strong></p>
+            <p><span>Data de Emissão:</span> <strong>{{ doc.data_emissao.strftime('%d/%m/%Y às %H:%M:%S') if doc.data_emissao else 'N/A' }}</strong></p>
+            <p><span>Origem dos Dados:</span> <strong>{{ doc.tabela_origem or 'N/A' }}</strong></p>
+            <p><span>Hash de Verificação:</span> <strong style="font-family: monospace; font-size: 0.8rem;">{{ doc.hash_conteudo or 'N/A' }}</strong></p>
+            <p><span>Usuário Emissor:</span> <strong>{{ doc.usuario_emissor.nome_completo if doc.usuario_emissor and doc.usuario_emissor.nome_completo else 'N/A' }} | {{ doc.usuario_emissor.email if doc.usuario_emissor and doc.usuario_emissor.email else 'N/A' }}</strong></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

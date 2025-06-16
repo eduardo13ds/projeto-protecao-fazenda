@@ -9,9 +9,9 @@
             "server": "localhost",
             "port": 3306,
             "driver": "MariaDB",
-            "name": "sistema_alerta_chuvas_local",
+            "name": "stormguad",
             "username": "root",
-            "database": "sistema_alerta_chuvas",
+            "database": "stormguard",
             "password": ""
         }
     ]

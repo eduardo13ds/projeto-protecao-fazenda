@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Documento Não Encontrada{% endblock %}
+
+{% block content %}
+
+<style>
+    .verification-container { min-height: 70vh; display: flex; align-items: center; justify-content: center; padding: 2rem 0; }
+    .verification-card { max-width: 700px; width: 100%; background-color: var(--cor-fundo-painel); border: 1px solid var(--cor-borda-painel); border-radius: 12px; padding: 2.5rem; backdrop-filter: blur(5px); text-align: center; }
+    .status-icon { font-size: 5rem; margin-bottom: 1rem; }
+    .status-icon.failure { color: var(--cor-alerta); text-shadow: 0 0 20px rgba(255, 71, 87, 0.5); }
+    .verification-title { font-size: 2rem; font-weight: 700; color: var(--cor-texto-principal); margin-bottom: 1.5rem; }
+</style>
+
+<div class="verification-container">
+    <div class="verification-card" style="border-color: var(--cor-alerta);">
+        <i class="fas fa-times-circle status-icon failure"></i>
+        <h1 class="verification-title">Verificação Falhou</h1>
+        <p class="text-white-50">
+            O ID do documento fornecido não foi encontrado em nossos registros ou é inválido.
+        </p>
+        <div class="alert-details mt-4 text-start">
+             <p class="mb-2">Por favor, verifique se:</p>
+            <ul class="text-white-50" style="list-style-position: inside;">
+                <li>O link ou ID foi digitado corretamente.</li>
+                <li>O documento não é uma falsificação ou cópia inválida.</li>
+                <li>O documento não foi revogado pelo sistema.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
