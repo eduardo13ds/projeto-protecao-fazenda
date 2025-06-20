@@ -1,97 +1,113 @@
 <!-- Adicione a classe 'header-principal' e remova outras classes de estilo conflitantes -->
-<nav class="navbar navbar-expand-lg sticky-top header-principal glass-effect-final">
-  <div class="container">
-    <!-- O logo e o texto da marca agora terão o estilo de texto do header -->
-    <a class="navbar-brand d-flex align-items-center" href="/">
-      <!-- <img
+<nav
+    class="navbar navbar-expand-lg sticky-top header-principal glass-effect-final"
+>
+    <div class="container">
+        <!-- O logo e o texto da marca agora terão o estilo de texto do header -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <!-- <img
         src="{{ url_for('static', filename='images/logo.svg') }}"
         alt="StormGuard logo"
         width="32"
         height="32"
         class="d-inline-block align-text-top me-2"
       /> -->
-      <span class="h4 mb-0">StormGuard</span>
-    </a>
+            <span class="h4 mb-0">StormGuard</span>
+        </a>
 
-    <!-- Os indicadores ganham a classe genérica 'header-indicator' para um estilo unificado -->
-    <span class="rounded-pill indicator live-button header-indicator"> Monitorando </span>
-    <span
-      class="rounded-pill indicator alert-indicator header-indicator"
-      id="header-alert-status"
-      >Sem Alertas</span
-    >
+        <!-- Os indicadores ganham a classe genérica 'header-indicator' para um estilo unificado -->
+        <span class="rounded-pill indicator live-button header-indicator">
+            Monitorando
+        </span>
+        <span
+            class="rounded-pill indicator alert-indicator header-indicator"
+            id="header-alert-status"
+            >Sem Alertas</span
+        >
 
-    <!-- O botão toggler precisa ser estilizado para temas escuros -->
-    <button
-      class="navbar-toggler"
-      type="button"
-      data-bs-toggle="collapse"
-      data-bs-target="#mainNavbar"
-      aria-controls="mainNavbar"
-      aria-expanded="false"
-      aria-label="Toggle navigation"
-    >
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="mainNavbar">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-        <!-- Links de navegação. A classe 'active' do Bootstrap será usada para o destaque -->
-        <li class="nav-item">
-          <a
-            class="nav-link"
-            aria-current="page"
-            href="/"
-            >Início</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/painel_alertas"
-            >Painel de Alertas</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/relatorios"
-            >Relatórios</a
-          >
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/configuracoes"
-            >Configurações</a
-          >
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="/admin">Administrador</a>
-        </li>
-
-        <!-- Dropdown -->
-        <li class="nav-item dropdown">
-          <a
-            class="nav-link dropdown-toggle"
-            href="#"
-            id="areaDropdown"
-            role="button"
-            data-bs-toggle="dropdown"
+        <!-- O botão toggler precisa ser estilizado para temas escuros -->
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#mainNavbar"
+            aria-controls="mainNavbar"
             aria-expanded="false"
-          >
-            Área: {{ current_area_name or "Selecione" }}
-          </a>
-          <!-- O menu dropdown também será estilizado -->
-          <ul class="dropdown-menu" aria-labelledby="areaDropdown">
-            <li><a class="dropdown-item" href="/1">Área 1 (Central)</a></li>
-            <li><a class="dropdown-item" href="/2">Área 2 (Norte)</a></li>
-            <li><a class="dropdown-item" href="/3">Área 3 (Sul)</a></li>
-            <li><a class="dropdown-item" href="/4">Área 4 (Leste)</a></li>
-            <li><a class="dropdown-item" href="/5">Área 5 (Oeste)</a></li>
-          </ul>
-        </li>
-      </ul>
+            aria-label="Toggle navigation"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-      <!-- Botão de Logout com a classe específica para estilização -->
-      <a href="{{ url_for('login.logout') }}" class="nav-link ms-lg-3 mt-2 mt-lg-0 logout-button">
-          Logout
-      </a>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <!-- Links de navegação. A classe 'active' do Bootstrap será usada para o destaque -->
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="/">Início</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/painel_alertas"
+                        >Painel de Alertas</a
+                    >
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/relatorios">Relatórios</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/configuracoes">Configurações</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin">Administrador</a>
+                </li>
+
+                <!-- Dropdown -->
+                <li class="nav-item dropdown">
+                    <a
+                        class="nav-link dropdown-toggle"
+                        href="#"
+                        id="areaDropdown"
+                        role="button"
+                        data-bs-toggle="dropdown"
+                        aria-expanded="false"
+                    >
+                        Área: {{ current_area_name or "Selecione" }}
+                    </a>
+                    <!-- O menu dropdown também será estilizado -->
+                    <ul class="dropdown-menu" aria-labelledby="areaDropdown">
+                        <li>
+                            <a class="dropdown-item" href="/1"
+                                >Área 1 (Central)</a
+                            >
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/2"
+                                >Área 2 (Norte)</a
+                            >
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/3">Área 3 (Sul)</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/4"
+                                >Área 4 (Leste)</a
+                            >
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/5"
+                                >Área 5 (Oeste)</a
+                            >
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <!-- Botão de Logout com a classe específica para estilização -->
+            <a
+                href="{{ url_for('login.logout') }}"
+                class="nav-link ms-lg-3 mt-2 mt-lg-0 logout-button"
+            >
+                Logout
+            </a>
+        </div>
     </div>
-  </div>
 </nav>

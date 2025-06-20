@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StormGuard - Sistema de Monitoramento</title>
+
+    <!-- Bootstrap CSS (se estiver usando) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome para ícones -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- CSS Principal Organizado - APENAS UM ARQUIVO! -->
+    <link rel="stylesheet" href="/static/styles/main.css">
+
+    <!-- Three.js para efeitos visuais (se necessário) -->
+    <script src="https://unpkg.com/three@0.165.0/build/three.module.js" type="module"></script>
+</head>
+<body>
+    <!-- HEADER COM NAVEGAÇÃO -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="/static/images/logo.svg" alt="StormGuard" width="32" height="32" class="me-2">
+                StormGuard
+            </a>
+
+            <div class="d-flex align-items-center gap-3">
+                <span id="header-alert-status" class="badge alert-inactive">Carregando...</span>
+                <button class="btn btn-sm live-button">
+                    <i class="fas fa-circle me-1"></i>AO VIVO
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BANNER DE ALERTA GLOBAL -->
+    <div id="custom-heavy-rain-alert" class="custom-heavy-rain-alert d-none">
+        <div class="alert-content">
+            <div class="alert-icon">
+                <i class="fas fa-cloud-showers-heavy"></i>
+            </div>
+            <div class="alert-details">
+                <h4>⚠️ Alerta de Chuva Intensa</h4>
+                <p>Área <span id="alert-area">--</span> em estado de alerta crítico</p>
+                <div class="alert-metrics">
+                    <div class="metric">
+                        <span class="metric-value" id="alert-probabilidade">--%</span>
+                        <span class="metric-label">Probabilidade</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value" id="alert-umidade">--%</span>
+                        <span class="metric-label">Umidade</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value" id="alert-campo-eletrico">-- mA</span>
+                        <span class="metric-label">Campo Elétrico</span>
+                    </div>
+                </div>
+            </div>
+            <div class="alert-actions">
+                <button id="ver-mais-alertas" class="btn btn-primary d-none">
+                    Ver mais <span id="num-alertas">0</span> alerta(s)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="dashboard-container" id="main-content">
+        <h1 class="welcome-title">Sistema de Monitoramento StormGuard</h1>
+
+        <!-- CARDS DE DADOS -->
+        <div class="dashboard-grid">
+            <!-- Card Probabilidade -->
+            <div id="card-probabilidade" class="card-tematico">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-cloud-rain"></i>
+                        Probabilidade de Chuva
+                    </h5>
+                    <p id="probabilidade-texto" class="fs-5">Carregando...</p>
+                </div>
+            </div>
+
+            <!-- Card Temperatura -->
+            <div id="card-temperatura" class="card-tematico">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-thermometer-half"></i>
+                        Temperatura
+                    </h5>
+                    <p id="temperatura-texto" class="fs-5">Carregando...</p>
+                </div>
+            </div>
+
+            <!-- Card Umidade -->
+            <div id="card-humidade" class="card-tematico">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-droplet"></i>
+                        Umidade
+                    </h5>
+                    <p id="humidade-texto" class="fs-5">Carregando...</p>
+                </div>
+            </div>
+
+            <!-- Card Campo Elétrico -->
+            <div id="card-campo-eletrico" class="card-tematico">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-lightning"></i>
+                        Campo Elétrico
+                    </h5>
+                    <p id="campo-eletrico-texto" class="fs-5">Carregando...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEÇÃO INMET -->
+        <section class="inmet-section">
+            <h3><i class="fas fa-satellite-dish me-2"></i>Dados INMET</h3>
+            <div</h3> class="inmet-grid">
+                <div class="inmet-card">
+                    <div class="metric-value" id="inmet-chuva">--</div>
+                    <div class="metric-label">Chuva (mm)</div>
+                </div>
+                <div class="inmet-card">
+                    <div class="metric-value" id="inmet-vento">--</div>
+                    <div class="metric-label">Vento (m/s)</div>
+                </div>
+                <div class="inmet-card">
+                    <div class="metric-value" id="inmet-pressao">--</div>
+                    <div class="metric-label">Pressão (hPa)</div>
+                </div>
+                <div class="inmet-card">
+                    <div class="metric-value" id="inmet-radiacao">--</div>
+                    <div class="metric-label">Radiação (KJ/m²)</div>
+                </div>
+            </div>
+            <div class="inmet-data-hora">Carregando dados...</div>
+        </section>
+
+        <!-- PREVISÕES -->
+        <section class="predictions-section">
+            <div class="prediction-card">
+                <h4><i class="fas fa-brain me-2"></i>Previsão IA</h4>
+                <div class="prediction-value" id="previsao-modelo-texto">Calculando...</div>
+                <div class="prediction-note">Previsão de precipitação baseada em IA</div>
+            </div>
+        </section>
+
+        <!-- RAZÕES -->
+        <section class="reasons-section">
+            <h4><i class="fas fa-list-ul me-2"></i>Fatores de Análise</h4>
+            <ul id="razoes-lista" class="list-group list-group-flush">
+                <li class="list-group-item">Carregando fatores...</li>
+            </ul>
+        </section>
+
+        <!-- SELETOR DE ÁREA -->
+        <div class="area-selector">
+            <div class="area-dropdown" id="areaDropdown">
+                Área: Carregando...
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="area-dropdown-menu d-none" id="areaDropdownMenu">
+                <div class="area-dropdown-item area-item" data-area="all">Todas as Áreas</div>
+                <div class="area-dropdown-item area-item" data-area="1">Central</div>
+                <div class="area-dropdown-item area-item" data-area="2">Norte</div>
+                <div class="area-dropdown-item area-item" data-area="3">Sul</div>
+                <div class="area-dropdown-item area-item" data-area="4">Leste</div>
+                <div class="area-dropdown-item area-item" data-area="5">Oeste</div>
+            </div>
+        </div>
+
+        <!-- BOTÕES DE AÇÃO -->
+        <div class="action-button-group">
+            <button id="refresh-data" class="action-btn">
+                <i class="fas fa-sync-alt"></i>
+                Atualizar Dados
+            </button>
+            <button class="action-btn" data-export="pdf">
+                <i class="fas fa-file-pdf"></i>
+                Exportar PDF
+            </button>
+            <button class="action-btn" data-export="excel">
+                <i class="fas fa-file-excel"></i>
+                Exportar Excel
+            </button>
+        </div>
+    </main>
+
+    <!-- SCRIPTS ORGANIZADOS -->
+
+    <!-- 1. Utilitários (primeiro) -->
+    <script src="/static/scripts/utils.js"></script>
+
+    <!-- 2. API (segundo) -->
+    <script src="/static/scripts/api.js"></script>
+
+    <!-- 3. Componentes (terceiro) -->
+    <script src="/static/scripts/components/alerts.js"></script>
+    <script src="/static/scripts/components/dashboard.js"></script>
+
+    <!-- 4. Script principal (último) -->
+    <script src="/static/scripts/main.js"></script>
+
+    <!-- Chart.js para gráficos (se necessário) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Bootstrap JS (se estiver usando) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- EXEMPLO DE COMO USAR A API ORGANIZADA -->
+    <script>
+        // Aguardar a aplicação estar pronta
+        document.addEventListener('stormguard:ready', () => {
+            console.log('🌩️ StormGuard está pronto!');
+
+            // Exemplo de uso da API organizada
+            StormGuard.getModule('api').fetchLatestData()
+                .then(result => {
+                    if (result.success) {
+                        console.log('Dados recebidos:', result.data);
+                    }
+                });
+
+            // Exemplo de uso dos utilitários
+            const utils = StormGuard.getModule('utils');
+            if (utils) {
+                console.log('Data formatada:', utils.formatDate(new Date()));
+            }
+        });
+    </script>
+</body>
+</html>

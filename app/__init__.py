@@ -61,6 +61,13 @@ def create_app(config_name='default'):
     login_manager.init_app(app)
     mqtt_client.init_app(app)
 
+    with app.app_context():
+        from .ml_services import PredictionService
+        try:
+            PredictionService.get_model()
+        except Exception as e:
+            app.logger.critical(f"Falha CRÍTICA ao carregar o modelo de ML na inicialização: {e}")
+
     # Registro dos Blueprints
     from .blueprints.main import main as main_blueprint
     from .blueprints.errors import errors as errors_blueprint

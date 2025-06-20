@@ -1,56 +1,501 @@
-<!doctype html>
-<html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - StormGuard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
-</head>
-<body>
-<div class="login-container">
-    <div class="d-flex login-card flex-row">
-        <div class="login-logo-side text-center glass-effect-final">
-            <div class="d-flex align-items-center justify-content-center mb-3" style="gap: 1rem;">
-                <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="StormGuard logo">
-                <h2 class="mb-0">StormGuard</h2>
-            </div>
-            <p>Sistema inteligente de monitoramento e alertas meteorológicos para agricultura.</p>
-            <hr class="my-4" style="border-color:rgba(255,255,255,0.2);">
-            <p class="small mb-0">© {{ 2025 }} StormGuard<br>Todos os direitos reservados.</p>
-        </div>
-        <div class="login-form-side glass-effect-final">
-            <h1 class="text-center mb-4">Login</h1>
-                                {% with messages = get_flashed_messages(with_categories=true) %}
-                        {% if messages %}
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}" role="alert">
-                                    {{ message }}
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                    {% endwith %}
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Login - StormGuard Sistema de Monitoramento Meteorológico"
+    />
+    <meta name="author" content="StormGuard Team" />
+    <meta
+      name="csrf-token"
+      content="{{ csrf_token() if csrf_token else '' }}"
+    />
 
-                    <form method="POST" action="">
-                        {{ form.hidden_tag() }} <div class="mb-3">
-                            {{ form.username.label(class="form-label") }}
-                            {{ form.username(class="form-control") }}
-                        </div>
-                        <div class="mb-3">
-                            {{ form.password.label(class="form-label") }}
-                            {{ form.password(class="form-control") }}
-                        </div>
-                        <div class="mb-3 form-check">
-                            {{ form.remember_me(class="form-check-input") }}
-                            {{ form.remember_me.label(class="form-check-label") }}
-                        </div>
-                        <div class="d-grid">
-                            {{ form.submit(class="btn btn-primary") }}
-                        </div>
-                    </form>
+    <title>Login - StormGuard</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT"
+      crossorigin="anonymous"
+    />
+
+    <!-- Font Awesome Icons -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!-- MAIN CSS - Centralized imports including login styles -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/main.css') }}"
+    />
+
+    <!-- Login-specific optimizations -->
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Syne:wght@400;500;700&display=swap");
+      /* ====================================================== */
+      /* ======== ESTILO APRIMORADO PARA A PÁGINA DE LOGIN ======== */
+      /* ====================================================== */
+
+      /* --- 1. VARIÁVEIS DE TEMA E FUNDO --- */
+      :root {
+        --cor-fundo-painel: rgba(20, 22, 20, 0.6);
+        --cor-borda-painel: rgba(51, 255, 153, 0.2);
+        --cor-brilho-painel: rgba(51, 255, 153, 0.1);
+        --cor-texto-principal: #e8e8e8;
+        --cor-texto-secundario: #a0a0a0;
+        --cor-destaque-neon: #33ff99;
+        --cor-alerta: #ff4757;
+      }
+
+      body {
+        /* Fundo consistente com o resto do site */
+        background-image: url("https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=2070&auto=format&fit=crop");
+        background-size: cover;
+        background-position: center center;
+        background-attachment: fixed;
+        font-family: "Syne", sans-serif;
+      }
+
+      /* --- 2. LAYOUT E PAINEL DE LOGIN --- */
+      .login-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        padding: 2rem;
+      }
+
+      .login-card {
+        max-width: 900px;
+        width: 100%;
+        border-radius: 16px;
+        overflow: hidden; /* Garante que o efeito de vidro não vaze */
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-wrap: wrap; /* Para telas menores */
+      }
+
+      .login-logo-side,
+      .login-form-side {
+        /* Efeito de Vidro Refinado */
+        background: rgba(10, 15, 10, 0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 3rem;
+      }
+
+      /* --- 3. LADO DO LOGOTIPO --- */
+      .login-logo-side {
+        flex: 1;
+        min-width: 320px;
+        background: rgba(0, 0, 0, 0.3); /* Lado do logo um pouco mais escuro */
+        color: var(--cor-texto-principal);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .login-logo-side h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--cor-destaque-neon);
+      }
+      .login-logo-side p {
+        font-size: 1.1rem;
+        color: var(--cor-texto-secundario);
+      }
+
+      /* --- 4. LADO DO FORMULÁRIO --- */
+      .login-form-side {
+        flex: 1.2; /* Lado do formulário um pouco maior */
+        min-width: 320px;
+      }
+      .login-form-side h1 {
+        font-weight: 700;
+        color: var(--cor-destaque-neon);
+      }
+
+      /* --- 5. FORMULÁRIO TEMÁTICO --- */
+      .form-label {
+        color: var(--cor-texto-secundario);
+        font-weight: 500;
+      }
+      .form-control {
+        background-color: rgba(0, 0, 0, 0.4);
+        border: 1px solid #555;
+        color: var(--cor-texto-principal);
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        transition: all 0.2s ease-in-out;
+      }
+      .form-control:focus {
+        background-color: rgba(0, 0, 0, 0.2);
+        color: white;
+        border-color: var(--cor-destaque-neon);
+        box-shadow: 0 0 10px var(--cor-brilho-painel);
+        outline: none;
+      }
+      .input-group .form-control {
+        border-right: none; /* Remove a borda dupla no campo de senha */
+      }
+      .input-group .form-control:focus {
+        border-right: none;
+      }
+      .input-group .btn {
+        background-color: rgba(0, 0, 0, 0.4);
+        border: 1px solid #555;
+        border-left: none;
+        color: var(--cor-texto-secundario);
+      }
+      .input-group .btn:hover {
+        color: var(--cor-destaque-neon);
+      }
+
+      .form-check-label {
+        color: var(--cor-texto-secundario);
+      }
+      .form-check-input:checked {
+        background-color: var(--cor-destaque-neon);
+        border-color: var(--cor-destaque-neon);
+      }
+
+      /* --- 6. BOTÃO DE LOGIN E LINKS --- */
+      .btn-primary {
+        background: var(--cor-destaque-neon);
+        color: #000;
+        font-weight: 700;
+        border: none;
+        padding: 0.9rem;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+      }
+      .btn-primary:hover {
+        background: var(--cor-destaque-neon);
+        filter: brightness(1.2);
+        transform: translateY(-2px);
+      }
+
+      .login-form-side a {
+        color: var(--cor-texto-secundario);
+      }
+      .login-form-side a:hover {
+        color: var(--cor-destaque-neon);
+      }
+
+      /* --- 7. ESTADOS DE LOADING (Spinner) --- */
+      .login-form-loading .btn-primary {
+        position: relative;
+        color: transparent !important; /* Esconde o texto */
+      }
+      .login-form-loading .btn-primary::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 24px;
+        height: 24px;
+        margin: -12px 0 0 -12px;
+        border: 3px solid rgba(0, 0, 0, 0.2);
+        border-top-color: #000;
+        border-radius: 50%;
+        animation: login-spin 0.8s linear infinite;
+      }
+      @keyframes login-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* --- 8. RESPONSIVIDADE --- */
+      @media (max-width: 768px) {
+        .login-logo-side {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Skip Navigation for Accessibility -->
+    <a href="#login-form" class="skip-link sr-only sr-only-focusable">
+      Pular para formulário de login
+    </a>
+
+    <!-- Main Login Container -->
+    <div class="login-container">
+      <div class="d-flex login-card flex-row">
+        <!-- Logo Side -->
+        <div class="login-logo-side text-center glass-effect-heavy">
+          <div
+            class="d-flex align-items-center justify-content-center mb-3"
+            style="gap: 1rem"
+          >
+            <h2 class="mb-0">StormGuard</h2>
+          </div>
+          <p>
+            Sistema inteligente de monitoramento e alertas meteorológicos para
+            agricultura.
+          </p>
+          <hr class="my-4" style="border-color: rgba(255, 255, 255, 0.2)" />
         </div>
+
+        <!-- Form Side -->
+        <div class="login-form-side glass-effect-heavy">
+          <h1 class="text-center mb-4">Login</h1>
+
+          <!-- Flash Messages -->
+          {% with messages = get_flashed_messages(with_categories=true) %} {% if
+          messages %} {% for category, message in messages %}
+          <div
+            class="alert alert-{{ category }} alert-dismissible fade show"
+            role="alert"
+          >
+            <i
+              class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'info-circle' }} me-2"
+            ></i>
+            {{ message }}
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            ></button>
+          </div>
+          {% endfor %} {% endif %} {% endwith %}
+
+          <!-- Login Form -->
+          <form method="POST" action="" id="login-form" novalidate>
+            {{ form.hidden_tag() }}
+
+            <!-- Username Field -->
+            <div class="mb-3">
+              {{ form.username.label(class="form-label") }} {{
+              form.username(class="form-control", placeholder="Digite seu nome
+              de usuário", autocomplete="username", required=True) }} {% if
+              form.username.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.username.errors %}
+                <i class="fas fa-exclamation-circle me-1"></i>{{ error }} {%
+                endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Password Field -->
+            <div class="mb-3">
+              {{ form.password.label(class="form-label") }}
+              <div class="input-group">
+                {{ form.password(class="form-control", placeholder="Digite sua
+                senha", autocomplete="current-password", required=True) }}
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  id="togglePassword"
+                >
+                  <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                </button>
+              </div>
+              {% if form.password.errors %}
+              <div class="invalid-feedback d-block">
+                {% for error in form.password.errors %}
+                <i class="fas fa-exclamation-circle me-1"></i>{{ error }} {%
+                endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Remember Me -->
+            <div class="mb-3 form-check">
+              {{ form.remember_me(class="form-check-input") }} {{
+              form.remember_me.label(class="form-check-label") }}
+            </div>
+
+            <!-- Submit Button -->
+            <div class="d-grid">
+              {{ form.submit(class="btn btn-primary", id="loginSubmitBtn") }}
+            </div>
+          </form>
+
+          <!-- Additional Links -->
+          <div class="text-center mt-4">
+            <p class="mb-0">
+              <a href="#" class="text-decoration-none">
+                <i class="fas fa-question-circle me-1"></i>
+                Esqueceu sua senha?
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
-</body>
+
+    <!-- ARIA Live Region for Form Feedback -->
+    <div
+      id="form-live-region"
+      aria-live="polite"
+      aria-atomic="true"
+      class="sr-only"
+    ></div>
+
+    <!-- Bootstrap JavaScript -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO"
+      crossorigin="anonymous"
+      defer
+    ></script>
+
+    <!-- CORE JAVASCRIPT MODULES - Essential for login -->
+
+    <!-- 1. Utilities Module -->
+    <script
+      src="{{ url_for('static', filename='scripts/utils.js') }}"
+      defer
+    ></script>
+
+    <!-- 2. API Module -->
+    <script
+      src="{{ url_for('static', filename='scripts/api.js') }}"
+      defer
+    ></script>
+
+    <!-- 3. Main Application Controller -->
+    <script
+      src="{{ url_for('static', filename='scripts/main.js') }}"
+      defer
+    ></script>
+
+    <!-- Login-specific JavaScript -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("login-form");
+        const submitBtn = document.getElementById("loginSubmitBtn");
+        const togglePassword = document.getElementById("togglePassword");
+        const passwordField = document.getElementById("password");
+        const toggleIcon = document.getElementById("togglePasswordIcon");
+        const liveRegion = document.getElementById("form-live-region");
+
+        // Password visibility toggle
+        if (togglePassword && passwordField && toggleIcon) {
+          togglePassword.addEventListener("click", function () {
+            const type =
+              passwordField.getAttribute("type") === "password"
+                ? "text"
+                : "password";
+            passwordField.setAttribute("type", type);
+
+            toggleIcon.className =
+              type === "password" ? "fas fa-eye" : "fas fa-eye-slash";
+
+            // Announce to screen readers
+            liveRegion.textContent =
+              type === "password" ? "Senha ocultada" : "Senha visível";
+          });
+        }
+
+        // Form validation and submission
+        if (form && submitBtn) {
+          form.addEventListener("submit", function (e) {
+            // Clear previous validation states
+            const inputs = form.querySelectorAll(".form-control");
+            inputs.forEach((input) => {
+              input.classList.remove("is-invalid", "is-valid");
+            });
+
+            // Basic client-side validation
+            let isValid = true;
+            const username = form.querySelector("#username");
+            const password = form.querySelector("#password");
+
+            if (username && !username.value.trim()) {
+              username.classList.add("is-invalid");
+              isValid = false;
+            } else if (username) {
+              username.classList.add("is-valid");
+            }
+
+            if (password && !password.value.trim()) {
+              password.classList.add("is-invalid");
+              isValid = false;
+            } else if (password) {
+              password.classList.add("is-valid");
+            }
+
+            if (!isValid) {
+              e.preventDefault();
+              liveRegion.textContent =
+                "Por favor, preencha todos os campos obrigatórios";
+              return false;
+            }
+
+            // Show loading state
+            form.classList.add("login-form-loading");
+            submitBtn.disabled = true;
+
+            // Announce loading state
+            liveRegion.textContent = "Processando login, aguarde...";
+
+            // Allow form submission to proceed
+          });
+
+          // Handle form errors (restore form state if there are server errors)
+          const alertElements = document.querySelectorAll(".alert-error");
+          if (alertElements.length > 0) {
+            form.classList.remove("login-form-loading");
+            submitBtn.disabled = false;
+          }
+        }
+
+        // Keyboard navigation improvements
+        const focusableElements = form.querySelectorAll(
+          'input, button, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+
+        focusableElements.forEach((element) => {
+          element.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && this.type !== "submit") {
+              e.preventDefault();
+              const currentIndex = Array.from(focusableElements).indexOf(this);
+              const nextElement = focusableElements[currentIndex + 1];
+              if (nextElement) {
+                nextElement.focus();
+              }
+            }
+          });
+        });
+
+        // Auto-focus on first input if no errors
+        const firstInput = form.querySelector('input:not([type="hidden"])');
+        if (firstInput && !document.querySelector(".alert-error")) {
+          firstInput.focus();
+        }
+
+        // Theme initialization for login page
+        const savedTheme = localStorage.getItem("stormguard-theme") || "dark";
+        document.documentElement.setAttribute("data-theme", savedTheme);
+
+        console.log("🔐 Login page initialized");
+      });
+
+      // Handle browser back/forward navigation
+      window.addEventListener("pageshow", function (event) {
+        if (event.persisted) {
+          // Reset form state if page is loaded from cache
+          const form = document.getElementById("login-form");
+          if (form) {
+            form.classList.remove("login-form-loading");
+            form.querySelector("#loginSubmitBtn").disabled = false;
+          }
+        }
+      });
+    </script>
+  </body>
 </html>

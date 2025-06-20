@@ -52,12 +52,12 @@ endblock %} {% block content %} {% include 'alert_page_area.html' %}
 
 <div class="row row-cols-1 row-cols-md-4 g-4 mb-4">
   <div class="col">
-    <div id="card-probabilidade" class="card card-tematico text-center dynamic-card h-100 card-highlight-green">
+    <div id="card-precipitacao" class="card card-tematico text-center dynamic-card h-100 card-highlight-green">
       <div class="card-body">
         <h5 class="card-title">
-          <i class="bi bi-umbrella-fill me-2"></i>Probabilidade de Chuva
+          <i class="bi bi-umbrella-fill me-2"></i>Previsão de Chuva
         </h5>
-        <p id="probabilidade-texto" class="fs-5">75% - Crítico</p>
+        <p id="precipitacao-texto" class="fs-5">0 mm</p>
         <p class="text-muted small">Previsão para as próximas 2 horas</p>
       </div>
     </div>
@@ -213,74 +213,314 @@ endblock %} {% block content %} {% include 'alert_page_area.html' %}
             >Alertas Sonoros</label
           >
         </div>
-        <div class="form-check form-switch">
-          <input
-            class="form-check-input"
-            type="checkbox"
-            id="notificacoesPush"
-          />
-          <label class="form-check-label" for="notificacoesPush"
-            >Notificações Push</label
-          >
+        <div class="col">
+            <div class="card card-tematico text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-wind me-2"></i>Vento (m/s)
+                    </h5>
+                    <p id="inmet-vento" class="fs-5">--</p>
+                    <p class="text-muted small inmet-data-hora">--</p>
+                </div>
+            </div>
         </div>
-      </div>
+        <div class="col">
+            <div class="card card-tematico text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-speedometer2 me-2"></i>Pressão (hPa)
+                    </h5>
+                    <p id="inmet-pressao" class="fs-5">--</p>
+                    <p class="text-muted small inmet-data-hora">--</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card card-tematico text-center h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-sun-fill me-2"></i>Radiação (KJ/m²)
+                    </h5>
+                    <p id="inmet-radiacao" class="fs-5">--</p>
+                    <p class="text-muted small inmet-data-hora">--</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</div>
+
+    <div id="inmet-info" class="mb-3"></div>
+
+    <div class="row row-cols-1 row-cols-md-4 g-4 mb-4">
+        <div class="col">
+            <div
+                id="card-previsao-chuva"
+                class="card card-tematico text-center dynamic-card h-100 card-highlight-green"
+            >
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-umbrella-fill me-2"></i>Previsão de
+                        Chuva
+                    </h5>
+                    <p id="previsao-chuva-texto" class="fs-5">-- mm</p>
+                    <p class="text-muted small">
+                        Previsão para as próximas 2 horas
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div
+                id="card-temperatura"
+                class="card card-tematico text-center dynamic-card h-100"
+            >
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-thermometer-half me-2"></i>Temperatura
+                    </h5>
+                    <p id="temperatura-texto" class="fs-5">25°C - Normal</p>
+                    <p
+                        class="text-muted small d-flex align-items-center justify-content-center"
+                    >
+                        <span class="live-indicator"></span>
+                        <span>Atualizado agora</span>
+              
+                      </p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div
+                id="card-humidade"
+                class="card card-tematico text-center dynamic-card h-100"
+            >
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-droplet-fill me-2"></i>Umidade
+                    </h5>
+                    <p id="humidade-texto" class="fs-5">60% - Moderado</p>
+                    <p class="text-muted small">Atualizado agora</p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div
+                id="card-campo-eletrico"
+                class="card card-tematico text-center dynamic-card h-100"
+            >
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-lightning-charge-fill me-2"></i>Campo
+                        Elétrico V/m²
+                    </h5>
+                    <p id="campo-eletrico-texto" class="fs-5">10 mA - Baixo</p>
+                    <p class="text-muted small">Atualizado agora</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-4 mb-4">
+        <div class="col">
+            <div
+                id="card-razoes-precipitacao"
+                class="card card-tematico dynamic-card h-100"
+            >
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-card-list me-2"></i>Razões para
+                        Precipitação
+                    </h5>
+                    <ul
+                        id="razoes-lista"
+                        class="list-group list-group-flush mt-3"
+                    >
+                        <li class="list-group-item">Umidade alta: 85%</li>
+                        <li class="list-group-item">
+                            Queda de temperatura: 3°C
+                        </li>
+                        <li class="list-group-item">
+                            Campo elétrico elevado: 25 V/m²
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div
+                id="card-ultima-oscilacao"
+                class="card card-tematico text-center dynamic-card h-100"
+            >
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-activity me-2"></i>Última Oscilação
+                        Crítica
+                    </h5>
+                    <p id="ultima-oscilacao-texto" class="fs-5">
+                        Campo Elétrico: 30 V/m²
+                    </p>
+                    <p class="text-muted small">Registrado às 19:45</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card card-tematico mb-4">
+        <div class="card-body">
+            <h5 class="mb-3"><i class="bi bi-graph-up me-2"></i>Tendências</h5>
+            <div class="trend-legend mb-3">
+                <span class="temp">● Temperatura (°C)</span>
+                <span class="umid">● Umidade (%)</span>
+                <span class="campo">● Campo Elétrico (V/m²)</span>
+            </div>
+            <div>
+                <canvas id="trendChart" width="400" height="150"></canvas>
+            </div>
+            <div class="mt-3 text-end">
+                <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-secondary">1h</button>
+                    <button class="btn btn-outline-secondary">6h</button>
+                    <button class="btn btn-outline-secondary">24h</button>
+                    <button class="btn btn-outline-secondary">7d</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-12">
+            <div class="card card-tematico text-center">
+                <div class="card-body">
+                    <h4 class="welcome-title">
+                        🌾 Bem-vindo à Fazenda Digital 🌾
+                    </h4>
+                    <p class="card-text">
+                        Monitoramento inteligente para ajudar a cuidar da sua
+                        fazenda, prever chuvas e garantir o bem-estar dos
+                        animais.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-md-6">
+            <div class="card card-tematico h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-clock-history me-2"></i>Histórico de
+                        Alertas
+                    </h5>
+                    <ul class="list-group list-group-flush mt-3">
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center"
+                        >
+                            Alerta de Chuva Forte
+                            <span class="badge bg-warning text-dark"
+                                >19:30</span
+                            >
+                        </li>
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center"
+                        >
+                            Umidade Elevada
+                            <span class="badge bg-primary">19:05</span>
+                        </li>
+                        <li
+                            class="list-group-item d-flex justify-content-between align-items-center"
+                        >
+                            Campo Elétrico Alta
+                            <span class="badge bg-danger">18:45</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card card-tematico h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="bi bi-gear-fill me-2"></i>Configurações
+                    </h5>
+                    <div class="form-check form-switch mb-3 mt-4">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="alertasSonoros"
+                            checked
+                        />
+                        <label class="form-check-label" for="alertasSonoros"
+                            >Alertas Sonoros</label
+                        >
+                    </div>
+                    <div class="form-check form-switch">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            id="notificacoesPush"
+                        />
+                        <label class="form-check-label" for="notificacoesPush"
+                            >Notificações Push</label
+                        >
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  const ctx = document.getElementById("trendChart").getContext("2d");
-  const trendChart = new Chart(ctx, {
-    type: "line",
-    data: {
-      labels: ["1h", "2h", "3h", "4h", "5h", "6h"],
-      datasets: [
-        {
-          label: "Temperatura (°C)",
-          data: [22, 23, 24, 23, 22, 21],
-          borderColor: "rgba(255, 99, 132, 1)",
-          backgroundColor: "rgba(255, 99, 132, 0.2)",
-          fill: true,
-          tension: 0.4,
+    const ctx = document.getElementById("trendChart").getContext("2d");
+    const trendChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: ["1h", "2h", "3h", "4h", "5h", "6h"],
+            datasets: [
+                {
+                    label: "Temperatura (°C)",
+                    data: [22, 23, 24, 23, 22, 21],
+                    borderColor: "rgba(255, 99, 132, 1)",
+                    backgroundColor: "rgba(255, 99, 132, 0.2)",
+                    fill: true,
+                    tension: 0.4,
+                },
+                {
+                    label: "Umidade (%)",
+                    data: [60, 62, 65, 63, 61, 60],
+                    borderColor: "rgba(54, 162, 235, 1)",
+                    backgroundColor: "rgba(54, 162, 235, 0.2)",
+                    fill: true,
+                    tension: 0.4,
+                },
+                {
+                    label: "Corrente Elétrica (mA)",
+                    data: [5, 6, 7, 6, 5, 4],
+                    borderColor: "rgba(255, 206, 86, 1)",
+                    backgroundColor: "rgba(255, 206, 86, 0.2)",
+                    fill: true,
+                    tension: 0.4,
+                },
+            ],
         },
-        {
-          label: "Umidade (%)",
-          data: [60, 62, 65, 63, 61, 60],
-          borderColor: "rgba(54, 162, 235, 1)",
-          backgroundColor: "rgba(54, 162, 235, 0.2)",
-          fill: true,
-          tension: 0.4,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false, // Legenda já está no HTML
+                },
+            },
+            scales: {
+                x: {
+                    title: { display: false },
+                    ticks: { color: "white" },
+                },
+                y: {
+                    title: { display: false },
+                    ticks: { color: "white" },
+                },
+            },
         },
-        {
-          label: "Corrente Elétrica (mA)",
-          data: [5, 6, 7, 6, 5, 4],
-          borderColor: "rgba(255, 206, 86, 1)",
-          backgroundColor: "rgba(255, 206, 86, 0.2)",
-          fill: true,
-          tension: 0.4,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: false, // Legenda já está no HTML
-        },
-      },
-      scales: {
-        x: {
-          title: { display: false },
-          ticks: { color: "white" },
-        },
-        y: {
-          title: { display: false },
-          ticks: { color: "white" },
-        },
-      },
-    },
-  });
+    });
 </script>
 {% endblock %}

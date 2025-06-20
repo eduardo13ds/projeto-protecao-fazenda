@@ -1,0 +1,345 @@
+{% extends 'base.html' %}
+{% block title %}
+{% if record_id %}Editar{% else %}Criar{% endif %} {{ display_name }} - StormGuard
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* =================================================================== */
+    /* ===      CSS REFINADO PARA PÁGINA DE EDIÇÃO DE REGISTRO       === */
+    /* =================================================================== */
+
+    /* --- 1. FUNDAÇÃO E VARIÁVEIS (Necessário para o tema) --- */
+    :root {
+        --cor-fundo-painel: rgba(20, 22, 20, 0.92);
+        --cor-borda-painel: rgba(51, 255, 153, 0.25);
+        --cor-brilho-painel: rgba(51, 255, 153, 0.1);
+        --cor-texto-principal: #e8e8e8;
+        --cor-texto-secundario: #a0a0a0;
+        --cor-destaque-neon: #33ff99;
+        --cor-alerta: #ff4757;
+    }
+
+    /* --- 2. ESTRUTURA E PAINEL PRINCIPAL --- */
+    .edit-container {
+        max-width: 850px;
+        margin: 2rem auto; /* Centraliza o container na página */
+    }
+
+    .edit-card {
+        background-color: var(--cor-fundo-painel);
+        border: 1px solid var(--cor-borda-painel);
+        border-radius: 16px; /* Bordas mais suaves */
+        padding: 2.5rem; /* Espaçamento interno generoso */
+        backdrop-filter: blur(8px);
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+
+    /* --- 3. BREADCRUMB E CABEÇALHO --- */
+/* --- BREADCRUMB COM CONTRASTE CORRETO --- */
+.breadcrumb-edit {
+    /* Fundo escuro e semi-transparente para garantir contraste */
+    background-color: var(--cor-fundo-painel, rgba(20, 22, 20, 0.85));
+    
+    /* Borda sutil para definir o componente */
+    border: 1px solid var(--cor-borda-painel, rgba(51, 255, 153, 0.2));
+
+    /* Espaçamento interno e externo adequados */
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+}
+
+/* O estilo dos links continua o mesmo, pois já está bom */
+.breadcrumb-edit a {
+    color: var(--cor-destaque-neon, #33ff99);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.breadcrumb-edit a:hover {
+    color: white;
+}
+
+.breadcrumb-edit .breadcrumb-item.active {
+    color: var(--cor-texto-secundario, #a0a0a0);
+}
+
+.breadcrumb-edit .breadcrumb-item::before {
+    color: var(--cor-texto-secundario, #a0a0a0);
+}
+
+    .edit-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--cor-borda-painel);
+    }
+    .edit-title {
+        color: var(--cor-texto-principal);
+        font-weight: 700;
+        font-size: 1.8rem; /* Fonte mais elegante e proporcional */
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    .edit-title i {
+        color: var(--cor-destaque-neon);
+    }
+
+    /* --- 4. FORMULÁRIO TEMÁTICO --- */
+    /* Soluciona o alinhamento e a proporção dos campos */
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem 1.5rem; /* Espaçamento vertical e horizontal entre os campos */
+    }
+    @media (min-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr 1fr; /* Duas colunas em telas maiores */
+        }
+        .form-grid .full-width {
+            grid-column: 1 / -1; /* Permite que um campo ocupe a largura toda */
+        }
+    }
+
+    .form-label-edit {
+        color: var(--cor-texto-secundario);
+        font-weight: 500;
+        font-size: 0.9rem;
+        margin-bottom: 0.5rem;
+    }
+    .required::after {
+        content: " *";
+        color: var(--cor-alerta);
+    }
+
+    .form-control-edit,
+    .form-select-edit {
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.3);
+        border: 1px solid #555;
+        color: var(--cor-texto-principal);
+        border-radius: 8px;
+        padding: 0.8rem 1rem;
+        font-size: 1rem;
+        transition: all 0.2s ease-in-out;
+        margin-bottom: 0; /* Remove margem para o grid controlar o espaçamento */
+    }
+    .form-control-edit:focus,
+    .form-select-edit:focus {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-color: var(--cor-destaque-neon);
+        box-shadow: 0 0 10px var(--cor-brilho-painel);
+        outline: none;
+    }
+    select.form-select-edit option {
+        background: #212529;
+    }
+
+    /* --- 5. BOTÕES DE AÇÃO --- */
+    /* Soluciona o tamanho e a elegância */
+    .form-actions-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 2.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--cor-borda-painel);
+    }
+    .btn-edit-primary,
+    .btn-edit-secondary {
+        padding: 0.7rem 1.75rem; /* Padding refinado */
+        font-weight: 700;
+        border: 1px solid transparent;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+    .btn-edit-primary {
+        background-color: var(--cor-destaque-neon);
+        color: #000;
+        margin-left: 1rem;
+    }
+    .btn-edit-primary:hover {
+        filter: brightness(1.2);
+        transform: translateY(-2px);
+    }
+    .btn-edit-secondary {
+        color: var(--cor-texto-secundario);
+        border-color: #555;
+    }
+    .btn-edit-secondary:hover {
+        background-color: #444;
+        color: white;
+    }
+
+    /* --- 6. ALERTAS E MENSAGENS DE ERRO --- */
+    .alert-edit-error, .alert-edit-success {
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .alert-edit-error {
+        background-color: rgba(255, 71, 87, 0.15);
+        border: 1px solid var(--cor-alerta);
+        color: #ffb3ba;
+    }
+    .alert-edit-success {
+        background-color: rgba(51, 255, 153, 0.1);
+        border: 1px solid var(--cor-destaque-neon);
+        color: #b3ffcc;
+    }
+    .error-message {
+        color: var(--cor-alerta);
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+    }
+
+</style>
+<div class="edit-container">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb breadcrumb-edit">
+            <li class="breadcrumb-item">
+                <a href="{{ url_for('admin.manage_table', table_name=table_name) }}">
+                    {{ display_name }}
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                {% if record_id %}Editar Registro{% else %}Novo Registro{% endif %}
+            </li>
+        </ol>
+    </nav>
+
+    <div class="edit-card">
+        <div class="edit-header">
+            <h1 class="edit-title">
+                {% if record_id %}
+                    <i class="fas fa-edit"></i>Editar {{ display_name }}
+                {% else %}
+                    <i class="fas fa-plus"></i>Criar {{ display_name }}
+                {% endif %}
+            </h1>
+        </div>
+
+        <!-- Exibir mensagens flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert-edit-{{ 'error' if category == 'error' else 'success' if category == 'success' else 'info' }}">
+                        <i class="fas fa-{{ 'exclamation-triangle' if category == 'error' else 'check-circle' if category == 'success' else 'info-circle' }} me-2"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Formulário -->
+        <form method="POST">
+            {{ form.hidden_tag() if form.hidden_tag }}
+
+            <div class="form-grid">
+                {% for field in form %}
+                    {% if field.type == 'HiddenField' %}
+                        {{ field() }}
+                    {% elif field.type != 'SubmitField' %}
+                        <div class="{% if field.type == 'TextAreaField' %}full-width{% endif %}">
+                            <label for="{{ field.id }}" class="form-label-edit {% if field.flags.required %}required{% endif %}">
+                                {{ field.label.text }}
+                            </label>
+
+                            {% if field.type == 'TextAreaField' %}
+                                {{ field(class="form-control-edit", rows="4", placeholder="Digite aqui...") }}
+                            {% elif field.type == 'SelectField' %}
+                                {{ field(class="form-select-edit") }}
+                            {% elif field.type == 'DateTimeField' %}
+                                {{ field(class="form-control-edit", placeholder="AAAA-MM-DD HH:MM:SS") }}
+                            {% else %}
+                                {{ field(class="form-control-edit", placeholder="Digite aqui...") }}
+                            {% endif %}
+
+                            {% if field.errors %}
+                                {% for error in field.errors %}
+                                    <div class="error-message">
+                                        <i class="fas fa-exclamation-circle me-1"></i>{{ error }}
+                                    </div>
+                                {% endfor %}
+                                <script></script>
+                                    document.getElementById('{{ field.id }}').classList.add('field-error');
+                                </script>
+                            {% endif %}
+
+                            {% if field.description %}
+                                <div class="form-text-edit">{{ field.description }}</div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- Botões de ação -->
+            <div class="d-flex justify-content-end mt-4 pt-3" style="border-top: 1px solid var(--cor-borda-painel);">
+                <a href="{{ url_for('admin.manage_table', table_name=table_name) }}"
+                   class="btn-edit-secondary">
+                    <i class="fas fa-times me-2"></i>Cancelar
+                </a>
+                <button type="submit" class="btn-edit-primary">
+                    {% if record_id %}
+                        <i class="fas fa-save me-2"></i>Salvar Alterações
+                    {% else %}
+                        <i class="fas fa-plus me-2"></i>Criar Registro
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Validação de formulário em tempo real
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const inputs = form.querySelectorAll('.form-control-edit, .form-select-edit');
+
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                // Remove classe de erro ao começar a editar
+                this.classList.remove('field-error');
+
+                // Validações básicas
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('field-error');
+                }
+            });
+
+            input.addEventListener('input', function() {
+                // Remove erro ao digitar
+                this.classList.remove('field-error');
+            });
+        });
+
+        // Confirmação antes de sair se houver alterações
+        let formChanged = false;
+        inputs.forEach(input => {
+            input.addEventListener('change', function() {
+                formChanged = true;
+            });
+        });
+
+        window.addEventListener('beforeunload', function(e) {
+            if (formChanged) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // Remover flag de mudança quando formulário for submetido
+        form.addEventListener('submit', function() {
+            formChanged = false;
+        });
+    });
+</script>
+
+{% endblock %}

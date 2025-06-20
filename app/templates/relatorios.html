@@ -1,0 +1,1200 @@
+{% extends 'base.html' %} {% block title %} Relatórios - StormGuard {% endblock
+%} {% block content %}
+<!-- Chart.js for reports -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  /* ======================================================== */
+  /* === ESTILOS REFINADOS: DASHBOARD DE RELATÓRIOS ========= */
+  /* ======================================================== */
+
+  /* --- ESTRUTURA E PAINÉIS PRINCIPAIS --- */
+  .page-title-panel {
+    background: var(--cor-fundo-painel, rgba(20, 22, 20, 0.88));
+    border: 1px solid var(--cor-borda-painel, rgba(51, 255, 153, 0.2));
+    border-radius: 12px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .page-title-panel h2 {
+    color: var(--cor-texto-principal, #f0f0f0);
+    font-weight: 700;
+    font-size: 1.8rem;
+    margin: 0;
+  }
+  .page-title-panel h2 i {
+    color: var(--cor-destaque-neon, #33ff99);
+    margin-right: 1rem;
+  }
+
+  .filters-panel,
+  .chart-card {
+    background-color: var(--cor-fundo-painel, rgba(20, 22, 20, 0.88));
+    border: 1px solid var(--cor-borda-painel, rgba(51, 255, 153, 0.2));
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    backdrop-filter: blur(5px);
+  }
+
+  /* --- FILTROS --- */
+  .filter-label {
+    color: var(--cor-texto-secundario, #a0a0a0);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    display: block;
+    font-size: 0.9rem;
+  }
+  .filter-control {
+    background-color: rgba(0, 0, 0, 0.3);
+    border: 1px solid #555;
+    color: var(--cor-texto-principal, #e8e8e8);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    width: 100%;
+  }
+  .filter-control:focus {
+    outline: none;
+    border-color: var(--cor-destaque-neon, #33ff99);
+    box-shadow: 0 0 10px var(--cor-brilho-painel, rgba(51, 255, 153, 0.2));
+  }
+  /* CORREÇÃO: Estilo para as opções do select (pode não funcionar em todos os navegadores) */
+  select.filter-control option {
+    background: #2d3436;
+    color: var(--cor-texto-principal, #e8e8e8);
+  }
+  .btn-apply-filters {
+    width: 100%;
+    background: var(--cor-destaque-neon, #33ff99);
+    color: #000;
+    font-weight: 700;
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: 8px;
+  }
+
+  /* --- ESTATÍSTICAS RÁPIDAS --- */
+  /* (Estilos do seu código original, já estavam bons) */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background-color: var(--cor-fundo-painel);
+    border: 1px solid var(--cor-borda-painel);
+    border-left: 4px solid var(--cor-destaque-neon);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    transition: all 0.2s ease;
+  }
+  .stat-card:hover {
+    transform: translateY(-3px);
+    border-left-color: var(--cor-alerta);
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--cor-destaque-neon);
+    margin-bottom: 0.5rem;
+  }
+  .stat-label {
+    color: var(--cor-texto-secundario);
+    font-size: 0.9rem;
+  }
+
+  /* --- GRÁFICOS E MAPA DE CALOR --- */
+  /* (Estilos do seu código original, já estavam bons, com pequenos ajustes de proporção) */
+  .chart-card {
+    padding: 1.5rem;
+    height: 100%;
+  }
+  .chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--cor-borda-painel);
+  }
+  .chart-title {
+    color: var(--cor-destaque-neon);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+  } /* Altura padrão ajustada */
+  .heatmap-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    height: 250px;
+  }
+
+  .heatmap-cell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .heatmap-cell::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 70%
+    );
+    transform: translateX(-100%);
+    transition: transform 0.6s;
+  }
+
+  .heatmap-cell:hover::before {
+    transform: translateX(100%);
+  }
+
+  .heatmap-level-0 {
+    background: linear-gradient(135deg, #1a4d3a, #2d5a3d);
+    color: #a8e6cf;
+  } /* Baixo */
+  .heatmap-level-1 {
+    background: linear-gradient(135deg, #4d7c0f, #65a30d);
+    color: #ffffff;
+  } /* Moderado */
+  .heatmap-level-2 {
+    background: linear-gradient(135deg, #ea580c, #f97316);
+    color: #ffffff;
+  } /* Alto */
+  .heatmap-level-3 {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    color: #ffffff;
+  } /* Crítico */
+
+  .area-name {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+    opacity: 0.9;
+  }
+
+  .area-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .area-trend {
+    font-size: 0.7rem;
+    margin-top: 0.3rem;
+    opacity: 0.8;
+  }
+
+  /* === ESTATÍSTICAS RÁPIDAS === */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .stat-card {
+    background-color: var(--cor-fundo-painel);
+    border: 1px solid var(--cor-borda-painel);
+    border-left: 4px solid var(--cor-destaque-neon);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    transition: all 0.2s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-3px);
+    border-left-color: var(--cor-alerta);
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--cor-destaque-neon);
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-label {
+    color: var(--cor-texto-secundario);
+    font-size: 0.9rem;
+  }
+
+  /* === EXPORTAÇÃO === */
+  .export-panel {
+    background-color: var(--cor-fundo-painel);
+    border: 1px solid var(--cor-borda-painel);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-top: 2rem;
+    backdrop-filter: blur(5px);
+    text-align: center;
+  }
+
+  .export-btn {
+    background: linear-gradient(45deg, var(--cor-destaque-neon), #28a745);
+    color: #000;
+    border: none;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin: 0 0.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+
+  .export-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    filter: brightness(1.2);
+  }
+
+  /* === LOADING === */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    z-index: 10;
+  }
+
+  .loading-spinner {
+    border: 3px solid rgba(51, 255, 153, 0.3);
+    border-radius: 50%;
+    border-top: 3px solid var(--cor-destaque-neon);
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* === RESPONSIVIDADE === */
+  @media (max-width: 768px) {
+    .reports-container {
+      padding: 1rem 0.5rem;
+    }
+
+    .reports-header {
+      padding: 1.5rem;
+    }
+
+    .reports-title {
+      font-size: 2rem;
+    }
+
+    .chart-container {
+      height: 250px;
+    }
+
+    .heatmap-container {
+      grid-template-columns: repeat(2, 1fr);
+      height: auto;
+    }
+
+    .chart-header {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+</style>
+
+<div class="container-fluid px-4 py-4">
+  <div class="page-title-panel">
+    <h2><i class="fas fa-chart-bar"></i>Relatórios e Análises</h2>
+    <div class="d-flex gap-2">
+      <button
+        class="btn btn-sm btn-themed-secondary"
+        onclick="exportFullReport('pdf')"
+      >
+        <i class="fas fa-file-pdf me-2"></i>Exportar PDF
+      </button>
+      <button
+        class="btn btn-sm btn-themed-secondary"
+        onclick="exportFullReport('excel')"
+      >
+        <i class="fas fa-file-excel me-2"></i>Exportar Excel
+      </button>
+    </div>
+  </div>
+
+  <div class="filters-panel">
+    <div class="row align-items-end">
+      <div class="col-md-3">
+        <label for="periodFilter" class="filter-label">Período</label>
+        <select id="periodFilter" class="filter-control">
+          <option value="24h">Últimas 24 horas</option>
+          <option value="7d" selected>Últimos 7 dias</option>
+          <option value="30d">Últimos 30 dias</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="fazendaFilter" class="filter-label">Fazenda</label>
+        <select id="fazendaFilter" class="filter-control">
+          <option value="all">Todas</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="sensorFilter" class="filter-label">Tipo de Sensor</label>
+        <select id="sensorFilter" class="filter-control">
+          <option value="all">Todos</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <button id="applyFilters" class="btn-apply-filters">
+          <i class="fas fa-search me-2"></i>Aplicar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estatísticas Rápidas -->
+  <div class="stats-grid" id="quickStats">
+    <div class="stat-card">
+      <div class="stat-value" id="totalAlertas">--</div>
+      <div class="stat-label">Total de Alertas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="alertasCriticos">--</div>
+      <div class="stat-label">Alertas Críticos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="sensoresAtivos">--</div>
+      <div class="stat-label">Sensores Ativos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="mediaLeituras">--</div>
+      <div class="stat-label">Leituras/Hora</div>
+    </div>
+  </div>
+
+  <!-- Gráficos -->
+  <div class="row">
+    <!-- Mapa de Calor das Áreas -->
+    <div class="col-12 mb-4">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="fas fa-map"></i>Mapa de Calor - Intensidade de Alertas por
+            Área
+          </h3>
+          <div class="chart-actions">
+            <button class="chart-btn" onclick="refreshHeatmap()">
+              <i class="fas fa-sync-alt"></i>
+            </button>
+            <button class="chart-btn" onclick="exportChart('heatmap')">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="heatmap-container" id="heatmapContainer">
+          <!-- Será gerado dinamicamente -->
+        </div>
+      </div>
+    </div>
+
+    <!-- Timeline de Alertas -->
+    <div class="col-lg-8 mb-4">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="fas fa-chart-line"></i>Timeline de Alertas
+          </h3>
+          <div class="chart-actions">
+            <button
+              class="chart-btn"
+              onclick="toggleChartType('alertsTimeline')"
+            >
+              <i class="fas fa-exchange-alt"></i>
+            </button>
+            <button class="chart-btn" onclick="exportChart('alertsTimeline')">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="alertsTimelineChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Distribuição de Intensidade -->
+    <div class="col-lg-4 mb-4">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="fas fa-chart-pie"></i>Intensidade dos Alertas
+          </h3>
+          <div class="chart-actions">
+            <button class="chart-btn" onclick="exportChart('alertsIntensity')">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container small">
+          <canvas id="alertsIntensityChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leituras dos Sensores por Hora -->
+    <div class="col-lg-6 mb-4">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="fas fa-thermometer-half"></i>Leituras por Hora -
+            Temperatura
+          </h3>
+          <div class="chart-actions">
+            <button class="chart-btn" onclick="changeSensorType('temperatura')">
+              Temp
+            </button>
+            <button class="chart-btn" onclick="changeSensorType('umidade')">
+              Umid
+            </button>
+            <button class="chart-btn" onclick="changeSensorType('pressao')">
+              Press
+            </button>
+            <button class="chart-btn" onclick="exportChart('sensorReadings')">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="sensorReadingsChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status dos Dispositivos -->
+    <div class="col-lg-6 mb-4">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="fas fa-server"></i>Status dos Dispositivos
+          </h3>
+          <div class="chart-actions">
+            <button class="chart-btn" onclick="exportChart('deviceStatus')">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="deviceStatusChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Correlação entre Sensores -->
+    <div class="col-lg-6 mb-4">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="fas fa-project-diagram"></i>Correlação Temperatura x
+            Umidade
+          </h3>
+          <div class="chart-actions">
+            <button class="chart-btn" onclick="exportChart('correlation')">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="correlationChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Qualidade das Leituras -->
+    <div class="col-lg-6 mb-4">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">
+            <i class="fas fa-shield-alt"></i>Qualidade das Leituras
+          </h3>
+          <div class="chart-actions">
+            <button class="chart-btn" onclick="exportChart('quality')">
+              <i class="fas fa-download"></i>
+            </button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="qualityChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+
+<script>
+  // === VARIÁVEIS GLOBAIS ===
+  let charts = {};
+  let currentFilters = {
+    period: "7d",
+    fazenda: "all",
+    sensor: "all",
+  };
+
+  // === INICIALIZAÇÃO ===
+  document.addEventListener("DOMContentLoaded", function () {
+    initializeFilters();
+    loadQuickStats();
+    loadAllCharts();
+    generateHeatmap();
+
+    // Event listeners
+    document
+      .getElementById("applyFilters")
+      .addEventListener("click", applyFilters);
+  });
+
+  // === FILTROS ===
+  function initializeFilters() {
+    // Carregar fazendas
+    fetch("/api/reports/fazendas")
+      .then((response) => response.json())
+      .then((data) => {
+        const select = document.getElementById("fazendaFilter");
+        data.forEach((fazenda) => {
+          const option = document.createElement("option");
+          option.value = fazenda.id;
+          option.textContent = fazenda.nome;
+          select.appendChild(option);
+        });
+      });
+
+    // Carregar tipos de sensor
+    fetch("/api/reports/tipos-sensor")
+      .then((response) => response.json())
+      .then((data) => {
+        const select = document.getElementById("sensorFilter");
+        data.forEach((tipo) => {
+          const option = document.createElement("option");
+          option.value = tipo.id;
+          option.textContent = tipo.nome;
+          select.appendChild(option);
+        });
+      });
+  }
+
+  function applyFilters() {
+    currentFilters = {
+      period: document.getElementById("periodFilter").value,
+      fazenda: document.getElementById("fazendaFilter").value,
+      sensor: document.getElementById("sensorFilter").value,
+    };
+
+    showLoadingOnAllCharts();
+    loadQuickStats();
+    loadAllCharts();
+    generateHeatmap();
+  }
+
+  // === ESTATÍSTICAS RÁPIDAS ===
+  function loadQuickStats() {
+    fetch("/api/reports/quick-stats", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentFilters),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        document.getElementById("totalAlertas").textContent =
+          data.total_alertas || "--";
+        document.getElementById("alertasCriticos").textContent =
+          data.alertas_criticos || "--";
+        document.getElementById("sensoresAtivos").textContent =
+          data.sensores_ativos || "--";
+        document.getElementById("mediaLeituras").textContent =
+          data.media_leituras || "--";
+      })
+      .catch((error) => console.error("Erro ao carregar estatísticas:", error));
+  }
+
+  // === MAPA DE CALOR ===
+  function generateHeatmap() {
+    const container = document.getElementById("heatmapContainer");
+
+    fetch("/api/reports/heatmap", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentFilters),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        container.innerHTML = "";
+
+        const areas = ["Central", "Norte", "Sul", "Leste", "Oeste"];
+        areas.forEach((area, index) => {
+          const areaData = data.find((d) => d.area === area) || {
+            alertas: 0,
+            trend: 0,
+          };
+          const cell = document.createElement("div");
+
+          // Determinar nível baseado no número de alertas
+          let level = 0;
+          if (areaData.alertas > 10) level = 3;
+          else if (areaData.alertas > 5) level = 2;
+          else if (areaData.alertas > 2) level = 1;
+
+          const trendIcon =
+            areaData.trend > 0 ? "↗" : areaData.trend < 0 ? "↘" : "→";
+          const trendColor =
+            areaData.trend > 0
+              ? "#ff6b6b"
+              : areaData.trend < 0
+              ? "#51cf66"
+              : "#ffd43b";
+
+          cell.className = `heatmap-cell heatmap-level-${level}`;
+          cell.innerHTML = `
+                <div class="area-name">${area}</div>
+                <div class="area-value">${areaData.alertas}</div>
+                <div class="area-trend" style="color: ${trendColor};">${trendIcon} ${Math.abs(
+            areaData.trend
+          )}%</div>
+            `;
+
+          cell.addEventListener("click", () => {
+            // Filtrar por área específica
+            currentFilters.area = index + 1;
+            applyFilters();
+          });
+
+          container.appendChild(cell);
+        });
+      })
+      .catch((error) => {
+        console.error("Erro ao gerar mapa de calor:", error);
+        container.innerHTML =
+          '<p style="color: var(--cor-alerta); text-align: center; margin: 2rem;">Erro ao carregar dados do mapa</p>';
+      });
+  }
+
+  // === GRÁFICOS ===
+  function loadAllCharts() {
+    loadAlertsTimelineChart();
+    loadAlertsIntensityChart();
+    loadSensorReadingsChart();
+    loadDeviceStatusChart();
+    loadCorrelationChart();
+    loadQualityChart();
+  }
+
+  function loadAlertsTimelineChart() {
+    const ctx = document.getElementById("alertsTimelineChart").getContext("2d");
+
+    fetch("/api/reports/alerts-timeline", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentFilters),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (charts.alertsTimeline) {
+          charts.alertsTimeline.destroy();
+        }
+
+        charts.alertsTimeline = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Alertas por Hora",
+                data: data.values,
+                borderColor: "rgb(51, 255, 153)",
+                backgroundColor: "rgba(51, 255, 153, 0.1)",
+                fill: true,
+                tension: 0.4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              x: {
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+              y: {
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+            },
+          },
+        });
+      })
+      .catch((error) =>
+        console.error("Erro ao carregar timeline de alertas:", error)
+      );
+  }
+
+  function loadAlertsIntensityChart() {
+    const ctx = document
+      .getElementById("alertsIntensityChart")
+      .getContext("2d");
+
+    fetch("/api/reports/alerts-intensity", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentFilters),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (charts.alertsIntensity) {
+          charts.alertsIntensity.destroy();
+        }
+
+        charts.alertsIntensity = new Chart(ctx, {
+          type: "doughnut",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                data: data.values,
+                backgroundColor: [
+                  "#51cf66", // Leve
+                  "#ffd43b", // Moderado
+                  "#ff9f43", // Severo
+                  "#ff6b6b", // Crítico
+                ],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                position: "bottom",
+                labels: { color: "#e8e8e8" },
+              },
+            },
+          },
+        });
+      })
+      .catch((error) =>
+        console.error("Erro ao carregar intensidade de alertas:", error)
+      );
+  }
+
+  function loadSensorReadingsChart() {
+    const ctx = document.getElementById("sensorReadingsChart").getContext("2d");
+
+    fetch("/api/reports/sensor-readings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentFilters),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (charts.sensorReadings) {
+          charts.sensorReadings.destroy();
+        }
+
+        charts.sensorReadings = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: data.labels,
+            datasets: data.datasets.map((dataset, index) => ({
+              label: dataset.label,
+              data: dataset.data,
+              borderColor: ["#ff6b6b", "#4ecdc4", "#45b7d1"][index % 3],
+              backgroundColor: [
+                "rgba(255,107,107,0.1)",
+                "rgba(78,205,196,0.1)",
+                "rgba(69,183,209,0.1)",
+              ][index % 3],
+              fill: false,
+              tension: 0.4,
+            })),
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: "#e8e8e8" },
+              },
+            },
+            scales: {
+              x: {
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+              y: {
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+            },
+          },
+        });
+      })
+      .catch((error) =>
+        console.error("Erro ao carregar leituras dos sensores:", error)
+      );
+  }
+
+  function loadDeviceStatusChart() {
+    const ctx = document.getElementById("deviceStatusChart").getContext("2d");
+
+    fetch("/api/reports/device-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentFilters),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (charts.deviceStatus) {
+          charts.deviceStatus.destroy();
+        }
+
+        charts.deviceStatus = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Dispositivos",
+                data: data.values,
+                backgroundColor: [
+                  "#51cf66", // Ativo
+                  "#ff6b6b", // Inativo
+                  "#ffd43b", // Manutenção
+                ],
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              x: {
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+              y: {
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+            },
+          },
+        });
+      })
+      .catch((error) =>
+        console.error("Erro ao carregar status dos dispositivos:", error)
+      );
+  }
+
+  function loadCorrelationChart() {
+    const ctx = document.getElementById("correlationChart").getContext("2d");
+
+    fetch("/api/reports/correlation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentFilters),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (charts.correlation) {
+          charts.correlation.destroy();
+        }
+
+        charts.correlation = new Chart(ctx, {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                label: "Temperatura x Umidade",
+                data: data.points,
+                backgroundColor: "rgba(51, 255, 153, 0.6)",
+                borderColor: "rgb(51, 255, 153)",
+                pointRadius: 4,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: "#e8e8e8" },
+              },
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: "Temperatura (°C)",
+                  color: "#a0a0a0",
+                },
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: "Umidade (%)",
+                  color: "#a0a0a0",
+                },
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+            },
+          },
+        });
+      })
+      .catch((error) => console.error("Erro ao carregar correlação:", error));
+  }
+
+  function loadQualityChart() {
+    const ctx = document.getElementById("qualityChart").getContext("2d");
+
+    fetch("/api/reports/quality", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(currentFilters),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (charts.quality) {
+          charts.quality.destroy();
+        }
+
+        charts.quality = new Chart(ctx, {
+          type: "line",
+          data: {
+            labels: data.labels,
+            datasets: [
+              {
+                label: "Confiável",
+                data: data.confiavel,
+                backgroundColor: "rgba(81, 207, 102, 0.3)",
+                borderColor: "#51cf66",
+                fill: true,
+              },
+              {
+                label: "Ruído",
+                data: data.ruido,
+                backgroundColor: "rgba(255, 212, 59, 0.3)",
+                borderColor: "#ffd43b",
+                fill: true,
+              },
+              {
+                label: "Fora da Faixa",
+                data: data.fora_faixa,
+                backgroundColor: "rgba(255, 107, 107, 0.3)",
+                borderColor: "#ff6b6b",
+                fill: true,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                labels: { color: "#e8e8e8" },
+              },
+            },
+            scales: {
+              x: {
+                stacked: true,
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+              y: {
+                stacked: true,
+                ticks: { color: "#a0a0a0" },
+                grid: { color: "rgba(255,255,255,0.1)" },
+              },
+            },
+          },
+        });
+      })
+      .catch((error) =>
+        console.error("Erro ao carregar qualidade das leituras:", error)
+      );
+  }
+
+  // === FUNÇÕES AUXILIARES ===
+  function showLoadingOnAllCharts() {
+    const chartContainers = document.querySelectorAll(".chart-container");
+    chartContainers.forEach((container) => {
+      if (!container.querySelector(".loading-overlay")) {
+        const overlay = document.createElement("div");
+        overlay.className = "loading-overlay";
+        overlay.innerHTML = '<div class="loading-spinner"></div>';
+        container.appendChild(overlay);
+      }
+    });
+
+    setTimeout(() => {
+      chartContainers.forEach((container) => {
+        const overlay = container.querySelector(".loading-overlay");
+        if (overlay) {
+          overlay.remove();
+        }
+      });
+    }, 2000);
+  }
+
+  function refreshHeatmap() {
+    generateHeatmap();
+  }
+
+  function toggleChartType(chartName) {
+    if (charts[chartName]) {
+      const currentType = charts[chartName].config.type;
+      const newType = currentType === "line" ? "bar" : "line";
+      charts[chartName].config.type = newType;
+      charts[chartName].update();
+    }
+  }
+
+  function changeSensorType(type) {
+    currentFilters.sensorType = type;
+    loadSensorReadingsChart();
+  }
+
+  // === EXPORTAÇÃO ===
+  function exportChart(chartName) {
+    // Simula download do gráfico individual
+    const link = document.createElement("a");
+    link.download = `${chartName}_${new Date().getTime()}.png`;
+
+    if (charts[chartName]) {
+      link.href = charts[chartName].toBase64Image();
+      link.click();
+    } else {
+      alert("Gráfico não disponível para exportação");
+    }
+  }
+
+  function exportFullReport(format) {
+    const exportBtn = event.target;
+    const originalText = exportBtn.innerHTML;
+
+    exportBtn.innerHTML =
+      '<i class="fas fa-spinner fa-spin me-2"></i>Gerando...';
+    exportBtn.disabled = true;
+
+    const data = {
+      filters: currentFilters,
+      format: format,
+      charts: Object.keys(charts).map((name) => ({
+        name: name,
+        image: charts[name] ? charts[name].toBase64Image() : null,
+      })),
+    };
+
+    fetch("/api/reports/export-full", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.blob();
+        }
+        throw new Error("Erro na exportação");
+      })
+      .then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `relatorio_completo_${new Date().getTime()}.${format}`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      })
+      .catch((error) => {
+        console.error("Erro na exportação:", error);
+        alert("Erro ao exportar relatório. Tente novamente.");
+      })
+      .finally(() => {
+        exportBtn.innerHTML = originalText;
+        exportBtn.disabled = false;
+      });
+  }
+
+  // === UTILITÁRIOS ===
+  function formatTimestamp(timestamp) {
+    return new Date(timestamp).toLocaleString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      day: "2-digit",
+      month: "2-digit",
+    });
+  }
+
+  function getRandomColor() {
+    const colors = [
+      "#ff6b6b",
+      "#4ecdc4",
+      "#45b7d1",
+      "#96ceb4",
+      "#ffeaa7",
+      "#fab1a0",
+      "#e17055",
+      "#fd79a8",
+    ];
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+</script>
+
+{% endblock %}

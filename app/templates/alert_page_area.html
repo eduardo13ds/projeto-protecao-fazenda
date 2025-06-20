@@ -1,5 +1,3 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
 <style>
     /*
      * ALERTA DE CHUVA INTENSA - TEMA "COLHEITA DIGITAL"
@@ -7,9 +5,21 @@
 
     /* Assegure-se de que a animação exista no seu CSS principal */
     @keyframes pulse-alert {
-        0% { box-shadow: 0 0 15px rgba(0,0,0,0.4), 0 0 5px var(--cor-alerta); }
-        50% { box-shadow: 0 0 25px rgba(0,0,0,0.6), 0 0 15px var(--cor-alerta); }
-        100% { box-shadow: 0 0 15px rgba(0,0,0,0.4), 0 0 5px var(--cor-alerta); }
+        0% {
+            box-shadow:
+                0 0 15px rgba(0, 0, 0, 0.4),
+                0 0 5px var(--cor-alerta);
+        }
+        50% {
+            box-shadow:
+                0 0 25px rgba(0, 0, 0, 0.6),
+                0 0 15px var(--cor-alerta);
+        }
+        100% {
+            box-shadow:
+                0 0 15px rgba(0, 0, 0, 0.4),
+                0 0 5px var(--cor-alerta);
+        }
     }
 
     .custom-heavy-rain-alert {
@@ -17,11 +27,11 @@
         background-color: var(--cor-fundo-painel);
         color: var(--cor-texto-principal);
         backdrop-filter: blur(5px);
-        
+
         /* A urgência vem da borda e da animação */
         border: 1px solid var(--cor-alerta);
         border-radius: 12px;
-        
+
         padding: 1rem 1.5rem;
         margin-bottom: 1.5rem;
         display: flex;
@@ -30,7 +40,7 @@
         /* Aplicando a animação de pulso */
         animation: pulse-alert 2.5s infinite ease-in-out;
     }
-    
+
     /* Versão slim, se usada */
     .custom-heavy-rain-alert.slim {
         padding: 0.75rem 1.25rem;
@@ -52,7 +62,7 @@
         font-weight: 700;
         color: var(--cor-texto-principal);
     }
-    
+
     /* Badge 'Crítico' com a nossa cor de alerta */
     .custom-heavy-rain-alert .badge.bg-danger {
         background-color: var(--cor-alerta) !important;
@@ -60,7 +70,7 @@
         font-size: 0.7rem;
         padding: 0.3em 0.6em;
         vertical-align: middle;
-        border: 1px solid rgba(255,255,255,0.5);
+        border: 1px solid rgba(255, 255, 255, 0.5);
     }
 
     .custom-heavy-rain-alert .alert-details {
@@ -76,19 +86,19 @@
         display: flex;
         align-items: center;
     }
-    
+
     /* Ícones dos detalhes em verde-neon para parecerem leituras de dados */
     .custom-heavy-rain-alert .alert-details i {
         margin-right: 0.4rem;
         color: var(--cor-destaque-neon);
     }
-    
+
     /* Dando destaque aos valores numéricos */
     .custom-heavy-rain-alert .alert-details strong {
         color: var(--cor-texto-principal);
         font-weight: 700;
     }
-    
+
     /* O grande ícone decorativo, agora um elemento atmosférico */
     .custom-heavy-rain-alert .alert-icon-background {
         font-size: 4rem;
@@ -162,7 +172,10 @@
 </style>
 
 <div class="container">
-    <div class="custom-heavy-rain-alert slim d-none" id="custom-heavy-rain-alert">
+    <div
+        class="custom-heavy-rain-alert slim d-none"
+        id="custom-heavy-rain-alert"
+    >
         <i class="fas fa-cloud-showers-heavy alert-icon-main"></i>
         <div class="alert-content">
             <div>
@@ -170,17 +183,42 @@
                 <span class="badge bg-danger ms-2">Crítico</span>
             </div>
             <div class="alert-details">
-                <div><i class="fas fa-map-marker-alt"></i>Área: <span id="alert-area">--</span></div>
-                <div><i class="far fa-clock"></i>Previsão: Próximas 2 horas</div>
-                <div><i class="fas fa-water"></i>Probabilidade: <strong id="alert-probabilidade">--%</strong></div>
-                <div><i class="fas fa-tint"></i>Umidade: <strong id="alert-umidade">--%</strong></div>
-                <div><i class="fas fa-bolt"></i>Campo Elétrico: <strong id="alert-campo-eletrico">-- V/m²</strong></div>
+                <div>
+                    <i class="fas fa-map-marker-alt"></i>Área:
+                    <span id="alert-area">--</span>
+                </div>
+                <div>
+                    <i class="far fa-clock"></i>Previsão: Próximas 2 horas
+                </div>
+                <div>
+                    <i class="fas fa-water"></i>Probabilidade:
+                    <strong id="alert-probabilidade">--%</strong>
+                </div>
+                <div>
+                    <i class="fas fa-tint"></i>Umidade:
+                    <strong id="alert-umidade">--%</strong>
+                </div>
+                <div>
+                    <i class="fas fa-bolt"></i>Campo Elétrico:
+                    <strong id="alert-campo-eletrico">-- V/m²</strong>
+                </div>
             </div>
         </div>
-        <div class="d-flex align-items-center"> <a href="/painel_alertas" class="protocol-button d-none" id="ver-mais-alertas">
-                <i class="fas fa-list-alt"></i>Ver Mais (<span id="num-alertas">0</span>)
+        <div class="d-flex align-items-center">
+            <a
+                href="/painel_alertas"
+                class="protocol-button d-none"
+                id="ver-mais-alertas"
+            >
+                <i class="fas fa-list-alt"></i>Ver Mais (<span id="num-alertas"
+                    >0</span
+                >)
             </a>
-            <button class="protocol-button" id="iniciar-protocolo-alerta" type="button">
+            <button
+                class="protocol-button"
+                id="iniciar-protocolo-alerta"
+                type="button"
+            >
                 <i class="fas fa-play"></i>Iniciar Protocolo
             </button>
         </div>

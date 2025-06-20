@@ -22,8 +22,8 @@ Cadastra as propriedades rurais (tenants) que são monitoradas pelo sistema.
     )
 
     # Relacionamentos Um-para-Muitos (o "Um" está aqui)
-    # cascade="all, delete-orphan": se uma fazenda for deletada, seus sensores,
+    # cascade="all, delete-orphan": se uma fazenda for deletada, seus dispositivos,
     # atuadores e alertas associados também serão.
-    sensores = relationship("Sensor", back_populates="fazenda", cascade="all, delete-orphan")
+    dispositivos = relationship("Dispositivo", back_populates="fazenda", cascade="all, delete-orphan")
     atuadores = relationship("Atuador", back_populates="fazenda", cascade="all, delete-orphan")
     alertas = relationship("Alerta", back_populates="fazenda", cascade="all, delete-orphan")

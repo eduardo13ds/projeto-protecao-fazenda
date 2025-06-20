@@ -1,0 +1,16 @@
+pip install Flask
+pip install Flask-SQLAlchemy
+pip install Flask-Login
+pip install Werkzeug
+pip install WTForms
+pip install Flask-WTF
+pip install PyMySQL
+pip install mysql-connector-python
+pip install paho-mqtt
+pip install pandas
+pip install openpyxl
+pip install reportlab
+pip install qrcode
+pip install Pillow
+pip install CatBoost
+pip install numpy

@@ -1,25 +1,32 @@
 # app/models/__init__.py
-
-# Importa a tabela de associação primeiro, se aplicável
-from .tabelas_associacao import usuario_fazenda_acesso
-
-# Importa todas as suas classes de modelo
-from .nivel_acesso import NivelAcesso
 from .usuario import Usuario
-from .fazenda import Fazenda
-from .tipo_sensor import TipoSensor
-from .tipo_atuador import TipoAtuador
-from .sensor import Sensor
-from .atuador import Atuador
-from .registro_leitura import RegistroLeitura
-from .alerta import Alerta
-from .registro_comando_atuador import RegistroComandoAtuador
+from .nivel_acesso import NivelAcesso
 from .documentos_verificacao import DocumentoVerificacao
+from .fazenda import Fazenda
+from .dispositivo import Dispositivo
+from .sensor import Sensor
+from .tipo_sensor import TipoSensor
+from .registro_leitura import RegistroLeitura
+from .atuador import Atuador
+from .tipo_atuador import TipoAtuador
+from .registro_comando_atuador import RegistroComandoAtuador
+from .alerta import Alerta
+from .tabelas_associacao import usuario_fazenda_acesso, area_sensor_association, area_atuador_association
 
-# Você pode definir uma lista __all__ para exportar, se desejar
 __all__ = [
+    'Usuario',
+    'NivelAcesso',
+    'DocumentoVerificacao',
+    'Fazenda',
+    'Dispositivo',
+    'Sensor',
+    'TipoSensor',
+    'RegistroLeitura',
+    'Atuador',
+    'TipoAtuador',
+    'RegistroComandoAtuador',
+    'Alerta',
     'usuario_fazenda_acesso',
-    'NivelAcesso', 'Usuario', 'Fazenda', 'TipoSensor',
-    'TipoAtuador', 'Sensor', 'Atuador', 'RegistroLeitura',
-    'Alerta', 'RegistroComandoAtuador', 'DocumentoVerificacao'
+    'area_sensor_association',
+    'area_atuador_association'
 ]
