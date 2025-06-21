@@ -1,3 +1,4 @@
+#app/models/nivel_acesso.py
 from app.extensions import db
 
 class NivelAcesso(db.Model):

@@ -20,6 +20,7 @@ latest_inmet_data = {}
 SENSOR_MAP = {}
 DEVICE_MAP = {}  # Mapa adicional para informações dos dispositivos
 
+
 class MQTTClient:
     def __init__(self, app=None):
         self.client = None
@@ -36,10 +37,12 @@ class MQTTClient:
         self.client.on_connect = self._on_connect
         self.client.on_message = self._on_message
         self.client.tls_set(tls_version=ssl.PROTOCOL_TLS)
-        self.client.username_pw_set(app.config['MQTT_USERNAME'], app.config['MQTT_PASSWORD'])
+        self.client.username_pw_set(
+            app.config["MQTT_USERNAME"], app.config["MQTT_PASSWORD"]
+        )
 
         try:
-            self.client.connect(app.config['MQTT_BROKER'], app.config['MQTT_PORT'])
+            self.client.connect(app.config["MQTT_BROKER"], app.config["MQTT_PORT"])
             self.client.loop_start()
             self.app.logger.info("Cliente MQTT conectado com sucesso!")
         except Exception as e:
@@ -54,22 +57,25 @@ class MQTTClient:
         global SENSOR_MAP, DEVICE_MAP
         try:
             # Query otimizada que junta as tabelas necessárias
-            results = db.session.query(
-                Dispositivo.identificador_unico,
-                Dispositivo.id_dispositivo,
-                Dispositivo.nome_amigavel,
-                Dispositivo.area,
-                Dispositivo.status,
-                TipoSensor.nome_tipo,
-                TipoSensor.unidade_medida,
-                Sensor.id_sensor,
-                Sensor.status.label('sensor_status')
-            ).select_from(Dispositivo)\
-             .join(Sensor, Dispositivo.id_dispositivo == Sensor.id_dispositivo)\
-             .join(TipoSensor, Sensor.id_tipo_sensor == TipoSensor.id_tipo_sensor)\
-             .filter(Dispositivo.status == 'Ativo')\
-             .filter(Sensor.status == 'Ativo')\
-             .all()
+            results = (
+                db.session.query(
+                    Dispositivo.identificador_unico,
+                    Dispositivo.id_dispositivo,
+                    Dispositivo.nome_amigavel,
+                    Dispositivo.area,
+                    Dispositivo.status,
+                    TipoSensor.nome_tipo,
+                    TipoSensor.unidade_medida,
+                    Sensor.id_sensor,
+                    Sensor.status.label("sensor_status"),
+                )
+                .select_from(Dispositivo)
+                .join(Sensor, Dispositivo.id_dispositivo == Sensor.id_dispositivo)
+                .join(TipoSensor, Sensor.id_tipo_sensor == TipoSensor.id_tipo_sensor)
+                .filter(Dispositivo.status == "Ativo")
+                .filter(Sensor.status == "Ativo")
+                .all()
+            )
 
             new_sensor_map = {}
             new_device_map = {}
@@ -80,11 +86,11 @@ class MQTTClient:
                 # Mapear informações do dispositivo
                 if device_id not in new_device_map:
                     new_device_map[device_id] = {
-                        'id_dispositivo': row.id_dispositivo,
-                        'nome_amigavel': row.nome_amigavel,
-                        'area': row.area,
-                        'status': row.status,
-                        'sensores': {}
+                        "id_dispositivo": row.id_dispositivo,
+                        "nome_amigavel": row.nome_amigavel,
+                        "area": row.area,
+                        "status": row.status,
+                        "sensores": {},
                     }
 
                 # Mapear sensores do dispositivo
@@ -94,32 +100,38 @@ class MQTTClient:
                 # Armazena tanto o nome exato quanto uma versão em minúsculas para flexibilidade
                 sensor_type_key = row.nome_tipo.lower().strip()
                 new_sensor_map[device_id][sensor_type_key] = {
-                    'id_sensor': row.id_sensor,
-                    'nome_tipo': row.nome_tipo,
-                    'unidade_medida': row.unidade_medida,
-                    'status': row.sensor_status
+                    "id_sensor": row.id_sensor,
+                    "nome_tipo": row.nome_tipo,
+                    "unidade_medida": row.unidade_medida,
+                    "status": row.sensor_status,
                 }
 
                 # Adiciona também ao mapa de dispositivos para referência
-                new_device_map[device_id]['sensores'][sensor_type_key] = {
-                    'id_sensor': row.id_sensor,
-                    'nome_tipo': row.nome_tipo,
-                    'unidade_medida': row.unidade_medida
+                new_device_map[device_id]["sensores"][sensor_type_key] = {
+                    "id_sensor": row.id_sensor,
+                    "nome_tipo": row.nome_tipo,
+                    "unidade_medida": row.unidade_medida,
                 }
 
             SENSOR_MAP = new_sensor_map
             DEVICE_MAP = new_device_map
 
-            self.app.logger.info(f"Mapa de sensores carregado: {len(new_device_map)} dispositivos, "
-                               f"{sum(len(sensors) for sensors in new_sensor_map.values())} sensores ativos")
+            self.app.logger.info(
+                f"Mapa de sensores carregado: {len(new_device_map)} dispositivos, "
+                f"{sum(len(sensors) for sensors in new_sensor_map.values())} sensores ativos"
+            )
 
             # Log detalhado dos dispositivos carregados
             for device_id, device_info in new_device_map.items():
-                sensor_types = list(device_info['sensores'].keys())
-                self.app.logger.debug(f"Dispositivo '{device_id}': {len(sensor_types)} sensores ({', '.join(sensor_types)})")
+                sensor_types = list(device_info["sensores"].keys())
+                self.app.logger.debug(
+                    f"Dispositivo '{device_id}': {len(sensor_types)} sensores ({', '.join(sensor_types)})"
+                )
 
         except Exception as e:
-            self.app.logger.error(f"Falha crítica ao carregar o mapa de sensores do banco: {e}")
+            self.app.logger.error(
+                f"Falha crítica ao carregar o mapa de sensores do banco: {e}"
+            )
             SENSOR_MAP = {}
             DEVICE_MAP = {}
 
@@ -129,7 +141,9 @@ class MQTTClient:
             client.subscribe("sensor/dados", qos=0)
             client.subscribe("inmet/dados", qos=0)
         else:
-            self.app.logger.error(f"Falha ao conectar ao MQTT Broker, código de retorno: {reasonCode}")
+            self.app.logger.error(
+                f"Falha ao conectar ao MQTT Broker, código de retorno: {reasonCode}"
+            )
 
     def _on_message(self, client, userdata, msg):
         global latest_data, latest_data_by_area, latest_inmet_data
@@ -141,11 +155,11 @@ class MQTTClient:
                 with self.app.app_context():
                     success = self._save_data_to_db(data)
                     if success:
-                        self._update_device_ping(data.get('device_id'))
+                        self._update_device_ping(data.get("device_id"))
 
                 # Mantém lógica de tempo real para compatibilidade
-                if 'area' in data:
-                    latest_data_by_area[data['area']] = data
+                if "area" in data:
+                    latest_data_by_area[data["area"]] = data
                 latest_data = data
 
             elif msg.topic == "inmet/dados":
@@ -161,9 +175,11 @@ class MQTTClient:
         Salva as leituras no banco de dados, usando o device_id para identificar a origem.
         Retorna True se pelo menos uma leitura foi salva com sucesso.
         """
-        device_id = data.pop('device_id', None)
+        device_id = data.pop("device_id", None)
         if not device_id:
-            self.app.logger.warning(f"Mensagem recebida sem 'device_id'. Ignorando: {data}")
+            self.app.logger.warning(
+                f"Mensagem recebida sem 'device_id'. Ignorando: {data}"
+            )
             return False
 
         # Verifica se o dispositivo é conhecido pelo sistema
@@ -171,8 +187,10 @@ class MQTTClient:
         device_info = DEVICE_MAP.get(device_id)
 
         if not device_sensors_map or not device_info:
-            self.app.logger.warning(f"Dispositivo '{device_id}' desconhecido ou inativo. "
-                                  f"Mensagem ignorada. Verifique o cadastro e status.")
+            self.app.logger.warning(
+                f"Dispositivo '{device_id}' desconhecido ou inativo. "
+                f"Mensagem ignorada. Verifique o cadastro e status."
+            )
             # Recarrega o mapa caso um novo dispositivo tenha sido cadastrado
             self._load_sensor_map()
             return False
@@ -182,15 +200,15 @@ class MQTTClient:
         registros_processados = 0
 
         for key, value in data.items():
-            if key in ['area', 'timestamp']:  # Ignora campos de controle
+            if key in ["area", "timestamp"]:  # Ignora campos de controle
                 continue
 
             # Busca o sensor no mapa, tentando diferentes variações da chave
             sensor_info = None
             search_keys = [
                 key.lower().strip(),
-                key.replace('_', ' ').lower().strip(),
-                key.replace(' ', '_').lower().strip()
+                key.replace("_", " ").lower().strip(),
+                key.replace(" ", "_").lower().strip(),
             ]
 
             for search_key in search_keys:
@@ -199,26 +217,30 @@ class MQTTClient:
                     break
 
             if not sensor_info:
-                self.app.logger.debug(f"Tipo de sensor '{key}' não encontrado no dispositivo '{device_id}'. "
-                                    f"Sensores disponíveis: {list(device_sensors_map.keys())}")
+                self.app.logger.debug(
+                    f"Tipo de sensor '{key}' não encontrado no dispositivo '{device_id}'. "
+                    f"Sensores disponíveis: {list(device_sensors_map.keys())}"
+                )
                 continue
 
-            if value is None or value == '':
-                self.app.logger.debug(f"Valor vazio/nulo para '{key}' do dispositivo '{device_id}'")
+            if value is None or value == "":
+                self.app.logger.debug(
+                    f"Valor vazio/nulo para '{key}' do dispositivo '{device_id}'"
+                )
                 continue
 
             try:
                 # Tenta converter valor para numérico
-                valor_str = str(value).replace(',', '.')
+                valor_str = str(value).replace(",", ".")
                 valor_float = float(valor_str)
 
                 # Cria o registro de leitura
                 novo_registro = RegistroLeitura(
-                    id_sensor=sensor_info['id_sensor'],
+                    id_sensor=sensor_info["id_sensor"],
                     valor_leitura=valor_str,
                     timestamp_leitura=now,
                     valor_numerico=valor_float,
-                    unidade_medida=sensor_info['unidade_medida']
+                    unidade_medida=sensor_info["unidade_medida"],
                 )
 
                 # Valida a qualidade da leitura
@@ -228,25 +250,33 @@ class MQTTClient:
                 registros_processados += 1
 
             except (ValueError, TypeError) as e:
-                self.app.logger.warning(f"Valor '{value}' para '{key}' do dispositivo '{device_id}' "
-                                      f"não é um número válido: {e}")
+                self.app.logger.warning(
+                    f"Valor '{value}' para '{key}' do dispositivo '{device_id}' "
+                    f"não é um número válido: {e}"
+                )
 
         # Salva todos os registros válidos
         if registros_para_adicionar:
             try:
                 db.session.add_all(registros_para_adicionar)
                 db.session.commit()
-                self.app.logger.info(f"{len(registros_para_adicionar)} registros do dispositivo "
-                                   f"'{device_id}' ({device_info['nome_amigavel']}) salvos no DB.")
+                self.app.logger.info(
+                    f"{len(registros_para_adicionar)} registros do dispositivo "
+                    f"'{device_id}' ({device_info['nome_amigavel']}) salvos no DB."
+                )
                 return True
 
             except Exception as e:
                 db.session.rollback()
-                self.app.logger.error(f"Falha ao salvar registros do dispositivo '{device_id}' no DB: {e}")
+                self.app.logger.error(
+                    f"Falha ao salvar registros do dispositivo '{device_id}' no DB: {e}"
+                )
                 return False
         else:
             if registros_processados == 0:
-                self.app.logger.warning(f"Nenhum sensor válido encontrado na mensagem do dispositivo '{device_id}'")
+                self.app.logger.warning(
+                    f"Nenhum sensor válido encontrado na mensagem do dispositivo '{device_id}'"
+                )
             return False
 
     def _update_device_ping(self, device_id):
@@ -255,12 +285,16 @@ class MQTTClient:
             return
 
         try:
-            dispositivo = Dispositivo.query.filter_by(identificador_unico=device_id).first()
+            dispositivo = Dispositivo.query.filter_by(
+                identificador_unico=device_id
+            ).first()
             if dispositivo:
                 dispositivo.ultimo_ping = datetime.utcnow()
                 db.session.commit()
         except Exception as e:
-            self.app.logger.error(f"Erro ao atualizar ping do dispositivo '{device_id}': {e}")
+            self.app.logger.error(
+                f"Erro ao atualizar ping do dispositivo '{device_id}': {e}"
+            )
             db.session.rollback()
 
     def reload_sensor_map(self):
@@ -291,6 +325,7 @@ class MQTTClient:
 
     def get_latest_inmet_data(self):
         return latest_inmet_data
+
 
 # Instância global do cliente MQTT
 mqtt_client = MQTTClient()

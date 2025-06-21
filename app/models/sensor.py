@@ -1,3 +1,4 @@
+#app/models/sensor.py
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import relationship
 from app.extensions import db

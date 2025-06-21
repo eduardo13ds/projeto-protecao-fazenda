@@ -1,3 +1,4 @@
+#app/models/tipo_sensor.py
 from sqlalchemy.orm import relationship
 from app.extensions import db
 

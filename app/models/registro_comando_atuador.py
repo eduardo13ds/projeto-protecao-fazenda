@@ -1,3 +1,4 @@
+#app/models/registro_comando_atuador.py
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import relationship
 

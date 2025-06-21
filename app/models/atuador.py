@@ -1,6 +1,6 @@
+#app/models/atuador.py
 from sqlalchemy import ForeignKey, func
 from sqlalchemy.orm import relationship
-
 from app.extensions import db
 
 
